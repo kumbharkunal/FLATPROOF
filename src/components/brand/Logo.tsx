@@ -33,7 +33,8 @@ export function Logo({
     return (
       <span className="logo-swap" style={{ width, height }}>
         <img {...files("logo")} className="logo-on-light" alt="FlatProof Inspection Services" {...common} />
-        <img {...files("logo-reversed")} className="logo-on-dark" alt="" aria-hidden="true" {...common} />
+        {/* Hidden until a dark section sits under the nav: it can wait behind the hero photo. */}
+        <img {...files("logo-reversed")} className="logo-on-dark" alt="" aria-hidden="true" {...common} fetchPriority="low" />
       </span>
     );
   }
