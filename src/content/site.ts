@@ -114,12 +114,13 @@ export const site = {
 
   hero: {
     title: "Don’t take possession in the dark.",
-    lead: "Two engineers check your new flat against 125+ points, scan the walls with a thermal camera and measure the carpet area by laser. You get a snag report for your builder within 24 hours.",
+    lead: "Two engineers check your new flat against 125+\u00a0points, scan the walls with a thermal camera and measure the carpet area by laser. You get a snag report for your builder within 24\u00a0hours.",
     primary: { label: "Book on WhatsApp", wa: "book" as WaKey },
     secondary: { label: "See a sample report", href: "#report" },
     lens: {
       hintPointer: "Move the camera over the room",
       hintTouch: "Drag the camera or tap the photo",
+      hintMore: "Or turn on Thermal view to see all four at once.",
       toggle: "Thermal view",
       pause: "Pause scan",
       play: "Play scan",
@@ -142,7 +143,7 @@ export const site = {
         at: {
           desktop: { x: 72, y: 77 },
           mobile: { x: 70, y: 77 },
-          lineworkDesktop: { x: 71.9, y: 73.2 },
+          lineworkDesktop: { x: 69.4, y: 71 },
           lineworkMobile: { x: 68.5, y: 74.4 },
         },
       },
@@ -156,7 +157,7 @@ export const site = {
         at: {
           desktop: { x: 86, y: 55 },
           mobile: { x: 85, y: 55 },
-          lineworkDesktop: { x: 86.8, y: 54.8 },
+          lineworkDesktop: { x: 76.4, y: 55 },
           lineworkMobile: { x: 87, y: 55.3 },
         },
       },
@@ -170,7 +171,7 @@ export const site = {
         at: {
           desktop: { x: 80, y: 90 },
           mobile: { x: 48, y: 90 },
-          lineworkDesktop: { x: 80.6, y: 90.2 },
+          lineworkDesktop: { x: 77.3, y: 85.9 },
           lineworkMobile: { x: 50, y: 90.5 },
         },
       },
@@ -184,7 +185,7 @@ export const site = {
         at: {
           desktop: { x: 62, y: 45.5 },
           mobile: { x: 50, y: 30.5 },
-          lineworkDesktop: { x: 62.5, y: 44.9 },
+          lineworkDesktop: { x: 61, y: 44.6 },
           lineworkMobile: { x: 50, y: 30.2 },
         },
       },
@@ -280,7 +281,7 @@ export const site = {
         image: "engineer-thermal",
       },
       {
-        title: "Snag report within 24 hours",
+        title: "Snag report within 24\u00a0hours",
         body: "A PDF with photos, every defect tagged by severity, ready to send to your builder.",
         image: null,
       },
@@ -328,7 +329,7 @@ export const site = {
           severity: "audit" as const,
           tag: "RERA audit",
           title: "Carpet area, laser measured",
-          body: "Agreement 1,120.00 sq ft. Measured 1,088.40 sq ft. Short by 31.60 sq ft.",
+          body: "Agreement 1,120.00\u00a0sq\u00a0ft. Measured 1,088.40\u00a0sq\u00a0ft. Short by 31.60\u00a0sq\u00a0ft.",
           fix: "CAD dimension sheet attached for the builder.",
           thumb: "plan",
         },
@@ -340,20 +341,20 @@ export const site = {
   },
 
   carpet: {
-    title: "Measured: 31.60 sq ft short.",
+    title: "Measured: 31.60\u00a0sq\u00a0ft short.",
     body: "You pay for carpet area under RERA. We measure every room with a laser meter, compare it with your agreement and give you a CAD dimension sheet for the builder.",
     readout: [
       { label: "Agreement carpet area", value: 1120.0 },
       { label: "Measured carpet area", value: 1088.4 },
       { label: "Short by", value: 31.6, deficit: true },
     ],
-    unit: "sq ft",
+    unit: "sq\u00a0ft",
     calc: {
       label: "Your agreement rate",
-      unit: "₹ per sq ft",
+      unit: "₹ per sq\u00a0ft",
       placeholder: "Rate per sq ft",
       result: "{rupees} paid for area you didn’t get",
-      empty: "Enter your rate to see what 31.60 sq ft is worth.",
+      empty: "Enter your rate to see what 31.60\u00a0sq\u00a0ft is worth.",
     },
     note: "Plan is illustrative. Figures from sample report FP-PUNE-2026-088.",
     cta: { label: "Book a carpet-area audit", wa: "carpet" as WaKey },
@@ -381,7 +382,7 @@ export const site = {
       {
         id: "pre-possession",
         name: "Pre-possession inspection",
-        summary: "125+ points, a thermal scan and the carpet area, with a snag report in 24 hours.",
+        summary: "125+\u00a0points, a thermal scan and the carpet area, with a snag report in 24\u00a0hours.",
         wa: "book" as WaKey,
         image: "tap-test",
       },
@@ -434,7 +435,7 @@ export const site = {
       },
       {
         q: "What do I get?",
-        a: "A PDF snag report within 24 hours: every defect with a photo, a severity tag and a recommended fix, ready for your builder. Carpet-area audits add a CAD dimension sheet.",
+        a: "A PDF snag report within 24\u00a0hours: every defect with a photo, a severity tag and a recommended fix, ready for your builder. Carpet-area audits add a CAD dimension sheet.",
         show: true,
       },
       {

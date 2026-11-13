@@ -23,8 +23,10 @@ export function ReportMotion() {
       tl.to(tags[i], { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(2)" }, 0.6 + i * 0.32);
     });
 
+    // The desktop scrub ends when the section's top reaches 20% of the screen, so the sheet is
+    // complete wherever a nav or "See a sample report" jump lands (the section top under the pill).
     const st = desktop
-      ? ST.create({ trigger: sheet, start: "top 85%", end: "bottom 75%", scrub: true, animation: tl })
+      ? ST.create({ trigger: sheet, start: "top 85%", endTrigger: section, end: "top 20%", scrub: true, animation: tl })
       : ST.create({ trigger: sheet, start: "top 82%", animation: tl, toggleActions: "play none none none" });
 
     return () => {

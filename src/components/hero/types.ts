@@ -17,6 +17,7 @@ export type LensGrid = { cols: number; rows: number; data: string };
 export type LensCopy = {
   hintPointer: string;
   hintTouch: string;
+  hintMore: string;
   toggle: string;
   pause: string;
   play: string;

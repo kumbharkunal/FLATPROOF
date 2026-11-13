@@ -71,7 +71,10 @@ export function LensPanel({ copy, findings, found, current, touch, mode, thermal
             </a>
           </div>
         ) : (
-          <p className="panel-hint">{touch ? copy.hintTouch : copy.hintPointer}</p>
+          <div className="panel-hint">
+            <p>{touch ? copy.hintTouch : copy.hintPointer}</p>
+            <p className="panel-hint-more">{copy.hintMore}</p>
+          </div>
         )}
       </div>
       <p className="panel-caption">{copy.caption}</p>

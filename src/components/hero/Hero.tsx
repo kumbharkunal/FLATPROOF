@@ -3,6 +3,7 @@ import { preload } from "react-dom";
 import { images } from "@/content/images.generated";
 import { site } from "@/content/site";
 import { Button, WhatsAppButton } from "@/components/ui/Button";
+import { HERO_STACKED, HERO_WIDE } from "./layout";
 import { RoomLinework } from "./RoomLinework";
 import { ThermalLens } from "./ThermalLens";
 import type { LensFinding } from "./types";
@@ -10,7 +11,8 @@ import type { LensFinding } from "./types";
 // Hero: the flat as it looks on handover day, and a thermal camera that shows what the paint hides.
 // Photos come from `npm run images`; until both hero photos exist, an architectural line drawing of
 // the same room stands in so the lens still works.
-// Below 1024px the stage is a 4:5 crop, full width on phones and capped at 560px on tablets.
+// Below 1024px (and on portrait screens) the stage is a 4:5 crop, full width on phones and capped
+// at 560px on tablets; wide screens get the full-bleed 16:9 stage (see ./layout).
 const MOBILE_SIZES = "(max-width: 639.98px) 100vw, 560px";
 
 export function Hero() {
@@ -41,11 +43,11 @@ export function Hero() {
     const { props: dp } = getImageProps({ ...common, sizes: "100vw", src: d.src, width: d.width, height: d.height, alt });
     const { props: mp } = getImageProps({ ...common, sizes: MOBILE_SIZES, src: m.src, width: m.width, height: m.height, alt: site.images["hero-mobile"].alt });
     // Media-scoped preloads so the right hero image starts before CSS and JS (LCP).
-    preload(mp.src, { as: "image", imageSrcSet: mp.srcSet, imageSizes: MOBILE_SIZES, media: "(max-width: 1023.98px)", fetchPriority: "high" });
-    preload(dp.src, { as: "image", imageSrcSet: dp.srcSet, imageSizes: "100vw", media: "(min-width: 1024px)", fetchPriority: "high" });
+    preload(mp.src, { as: "image", imageSrcSet: mp.srcSet, imageSizes: MOBILE_SIZES, media: HERO_STACKED, fetchPriority: "high" });
+    preload(dp.src, { as: "image", imageSrcSet: dp.srcSet, imageSizes: "100vw", media: HERO_WIDE, fetchPriority: "high" });
     base = (
       <picture>
-        <source media="(min-width: 1024px)" srcSet={dp.srcSet} sizes="100vw" />
+        <source media={HERO_WIDE} srcSet={dp.srcSet} sizes="100vw" />
         <img {...mp} alt={mp.alt} fetchPriority="high" decoding="async" />
       </picture>
     );
@@ -54,7 +56,7 @@ export function Hero() {
     const { props: mt } = getImageProps({ ...t, sizes: MOBILE_SIZES, src: m.thermal.src, width: m.thermal.width, height: m.thermal.height });
     const thermalPicture = (
       <picture>
-        <source media="(min-width: 1024px)" srcSet={dt.srcSet} sizes="100vw" />
+        <source media={HERO_WIDE} srcSet={dt.srcSet} sizes="100vw" />
         <img {...mt} alt="" fetchPriority="low" decoding="async" />
       </picture>
     );

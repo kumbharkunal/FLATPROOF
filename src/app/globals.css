@@ -635,13 +635,20 @@ html.cursor-on .cursor {
     transform 260ms var(--ease-out),
     background-color 200ms var(--ease-ui);
 }
+/* The label is a small tag below-right of the pointer, so it never covers the button's own text. */
 .cursor-label {
-  width: 80px;
-  margin: -9px 0 0 -40px;
-  text-align: center;
+  margin: 20px 0 0 14px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  color: var(--color-paper);
   font-size: 0.75rem;
   line-height: 18px;
   font-weight: 650;
+  white-space: nowrap;
+}
+.cursor[data-theme="dark"] .cursor-label {
+  background: var(--color-paper);
   color: var(--color-ink);
 }
 .cursor[data-theme="dark"] .cursor-dot {
@@ -653,15 +660,8 @@ html.cursor-on .cursor {
 .cursor[data-state="link"] .cursor-ring {
   --s: 1.45;
 }
-.cursor[data-state="label"] .cursor-ring {
-  --s: 2.4;
-}
-.cursor[data-state="label"] .cursor-ring::after {
-  background: var(--color-teal-light);
-  box-shadow: none;
-}
 .cursor[data-state="link"] .cursor-dot,
-.cursor[data-state="label"] .cursor-dot,
+.cursor[data-state="label"] .cursor-ring,
 .cursor[data-state="hidden"] .cursor-dot,
 .cursor[data-state="hidden"] .cursor-ring,
 .cursor[data-state="native"] .cursor-dot,
@@ -774,7 +774,10 @@ html.cursor-on .cursor {
   display: flex;
   flex-direction: column;
 }
+/* DOM order is copy, panel, stage (focus goes from the Thermal view switch to the findings);
+   stacked layouts show copy, stage, panel. On the wide hero the stage is out of flow. */
 .hero-stage {
+  order: 1;
   position: relative;
   width: 100%;
   aspect-ratio: 4 / 5;
@@ -783,6 +786,9 @@ html.cursor-on .cursor {
   background: var(--color-mist);
   touch-action: pan-y;
   isolation: isolate;
+}
+.hero-lens > .hero-panel {
+  order: 2;
 }
 /* Cover box: the image's own ratio, scaled to cover the stage, centred (CSS only, SSR-safe). */
 .cover {
@@ -1151,16 +1157,26 @@ html.cursor-on .cursor {
   right: calc(100% + 14px);
 }
 .tally-link {
-  min-height: 32px;
+  min-height: 44px;
   margin-left: 2px;
   font-size: 0.875rem;
+}
+/* Empty state: the instruction, then the keyboard-friendly way to see everything. */
+.panel-hint p:first-child {
+  color: var(--color-paper);
+}
+.panel-hint-more {
+  margin-top: 4px;
+  font-size: 0.875rem;
+  line-height: 1.45;
 }
 .hero-caption {
   display: none;
 }
 
-/* Desktop: the honesty caption sits in the stage corner, like a photo credit. */
-@media (min-width: 1024px) {
+/* Wide hero: the honesty caption sits in the stage corner, like a photo credit.
+   The wide-hero query (1024px and up, at least 5:4) matches HERO_WIDE in components/hero/layout.ts. */
+@media (min-width: 1024px) and (min-aspect-ratio: 5/4) {
   .hero-caption {
     display: block;
     position: absolute;
@@ -1181,10 +1197,10 @@ html.cursor-on .cursor {
   }
 }
 
-/* Below 1024px: copy, a 4:5 stage, then the panel (DOM order). */
-@media (max-width: 1023.98px) {
+/* Stacked hero (below 1024px, or a portrait screen): copy, a 4:5 stage, then the panel (DOM order). */
+@media not all and (min-width: 1024px) and (min-aspect-ratio: 5/4) {
   .hero-ctas .hero-secondary {
-    min-height: 44px;
+    min-height: 48px;
     padding: 0 4px;
     box-shadow: none;
     color: var(--color-teal-ink);
@@ -1193,7 +1209,7 @@ html.cursor-on .cursor {
     text-decoration-color: rgb(1 110 130 / 0.4);
   }
 }
-@media (min-width: 640px) and (max-width: 1023.98px) {
+@media (min-width: 640px) and (max-width: 1023.98px), (min-width: 1024px) and (max-aspect-ratio: 1249/1000) {
   .hero-copy {
     width: 100%;
     max-width: 640px;
@@ -1211,14 +1227,14 @@ html.cursor-on .cursor {
   }
 }
 
-/* 1024px and up: full-bleed stage; copy and panel stacked in the calm left column. */
-@media (min-width: 1024px) {
+/* Wide hero: full-bleed stage; copy and panel stacked in the calm left column. */
+@media (min-width: 1024px) and (min-aspect-ratio: 5/4) {
   .hero {
     --r: 1.7778; /* 16:9 */
     --lens: clamp(190px, 16vw, 264px);
-    height: 100svh;
-    min-height: 660px;
-    display: block;
+    /* Grows with its content on short screens, so the copy and panel are never cut off. */
+    min-height: max(100svh, 660px);
+    display: flex;
   }
   .only-d {
     display: block !important;
@@ -1237,12 +1253,12 @@ html.cursor-on .cursor {
     top: var(--yd);
   }
   .hero-lens {
-    position: absolute;
-    inset: 0;
+    position: relative;
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: calc(max(12px, env(safe-area-inset-top)) + 64px + clamp(20px, 6.5vh, 88px)) 0 0 max(var(--gutter), calc((100vw - 1280px) / 2));
+    padding: calc(max(12px, env(safe-area-inset-top)) + 64px + clamp(20px, 6.5vh, 88px)) 0 clamp(24px, 4vh, 48px) max(var(--gutter), calc((100vw - 1280px) / 2));
   }
   .hero-stage {
     position: absolute;
@@ -1255,10 +1271,10 @@ html.cursor-on .cursor {
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    background: linear-gradient(90deg, rgb(255 255 255 / 0.9) 0%, rgb(255 255 255 / 0.74) 26%, rgb(255 255 255 / 0) 46%);
+    background: linear-gradient(90deg, rgb(255 255 255 / 0.92) 0%, rgb(255 255 255 / 0.84) 30%, rgb(255 255 255 / 0) 52%);
   }
   .hero[data-photo="false"] .hero-stage::after {
-    background: linear-gradient(90deg, rgb(255 255 255 / 0.82) 0%, rgb(255 255 255 / 0.6) 30%, rgb(255 255 255 / 0) 42%);
+    background: linear-gradient(90deg, rgb(255 255 255 / 0.96) 0%, rgb(255 255 255 / 0.9) 33%, rgb(255 255 255 / 0) 50%);
   }
   .hero-copy {
     width: min(40vw, 600px);
@@ -1285,11 +1301,19 @@ html.cursor-on .cursor {
     margin: 10px 0 0;
     font-size: 0.75rem;
   }
+  /* The chip names a finding when the lens locks on; idle, it stays out of the way. */
   .lens-chip {
     display: block;
+    opacity: 0;
+    background: var(--color-amber);
+    color: var(--color-ink);
+    transition: opacity 200ms var(--ease-ui);
+  }
+  .lens[data-locked="true"] .lens-chip {
+    opacity: 1;
   }
 }
-@media (min-width: 1024px) and (max-height: 820px) {
+@media (min-width: 1024px) and (min-aspect-ratio: 5/4) and (max-height: 820px) {
   .panel-text {
     display: none;
   }

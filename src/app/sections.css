@@ -445,12 +445,12 @@
   color: var(--color-slate);
 }
 .mini-report {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-top: 8px;
   padding: 18px;
   aspect-ratio: 4 / 3;
-  align-content: start;
   border-radius: var(--radius-media);
   background: var(--color-paper);
   box-shadow: var(--shadow-sheet);
@@ -470,11 +470,43 @@
 .mini-count {
   color: var(--color-teal-ink);
 }
+.mini-rows {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(#000 50%, transparent);
+  mask-image: linear-gradient(#000 50%, transparent);
+}
+/* A report row in miniature: a severity tag and a line of text. */
 .mini-row {
+  position: relative;
   height: 34px;
   border-radius: 8px;
   background: var(--color-mist);
-  box-shadow: inset 4px 0 0 var(--sev);
+}
+.mini-row::before,
+.mini-row::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  border-radius: 999px;
+}
+.mini-row::before {
+  left: 10px;
+  width: 28px;
+  height: 10px;
+  margin-top: -5px;
+  background: var(--sev);
+}
+.mini-row::after {
+  left: 48px;
+  right: 28%;
+  height: 6px;
+  margin-top: -3px;
+  background: var(--color-line);
 }
 .mini-row[data-sev="critical"] {
   --sev: var(--color-critical);
@@ -598,30 +630,25 @@
   font-size: 0.8125rem;
   color: var(--color-slate);
 }
+/* A value never breaks inside itself ("1,480 sq ft" stays whole); whole items wrap instead. */
 .sheet-meta dd {
   font-weight: 620;
   color: var(--color-ink);
+  white-space: nowrap;
 }
 .sheet-findings {
   display: grid;
   gap: 12px;
   padding: 16px 0;
 }
+/* Severity is carried by the tag alone (no side stripe). */
 .finding {
-  --sev: var(--color-teal-ink);
   display: grid;
   grid-template-columns: 56px 1fr;
   gap: 14px;
-  padding: 14px 14px 14px 16px;
+  padding: 14px;
   border-radius: 10px;
   background: var(--color-mist);
-  box-shadow: inset 4px 0 0 var(--sev);
-}
-.finding[data-sev="critical"] {
-  --sev: var(--color-critical);
-}
-.finding[data-sev="medium"] {
-  --sev: var(--color-amber);
 }
 .finding-thumb {
   width: 56px;
@@ -638,8 +665,14 @@
   stroke: var(--color-navy);
   stroke-width: 2;
 }
+/* The thermal frame fills its tile; its shapes carry their own fills. */
 .finding-thumb[data-kind="thermal"] {
-  background: radial-gradient(circle at 55% 60%, #06001a 0%, #240066 18%, #5c0092 34%, #98068f 50%, #cc2268 66%, #ec4c26 82%, #fa8806 100%);
+  overflow: hidden;
+}
+.finding-thumb[data-kind="thermal"] svg {
+  width: 100%;
+  height: 100%;
+  stroke: none;
 }
 .sev-tag {
   display: inline-flex;
@@ -685,10 +718,9 @@
 }
 @media (min-width: 640px) {
   .sheet-meta {
-    grid-template-columns: repeat(5, auto);
-  }
-  .sheet-meta > div:first-child {
-    grid-column: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
   }
 }
 @media (min-width: 1024px) {
@@ -740,10 +772,12 @@
   font-variation-settings: "wdth" 100;
   color: var(--color-slate);
 }
+/* Same side padding as the rows above, so labels and figures share their edges; the cloud
+   reaches past the row instead. */
 .readout-row.deficit {
   border-bottom: 0;
   margin-top: 6px;
-  padding: 16px 14px;
+  padding: 16px 6px;
 }
 .readout-row.deficit dt {
   font-weight: 650;
@@ -755,8 +789,8 @@
 }
 .deficit-cloud {
   position: absolute;
-  inset: 0;
-  width: 100%;
+  inset: 0 -10px;
+  width: calc(100% + 20px);
   height: 100%;
   overflow: visible;
   pointer-events: none;
@@ -1031,13 +1065,35 @@
   .svc-row {
     grid-template-columns: 1fr auto;
     align-items: center;
-    gap: 24px;
-    padding: 24px 12px 24px 0;
-    transition: padding-left var(--dur-ui) var(--ease-ui);
+    gap: 28px;
+    padding: 24px 0;
   }
-  .svc-row[data-active="true"] {
-    padding-left: 12px;
-    box-shadow: inset 3px 0 0 var(--color-teal);
+  /* Active row: the text slides right (inside the column gap) and a teal measure tick draws in
+     front of the name. Transform only. */
+  .svc-main {
+    transition: transform var(--dur-ui) var(--ease-ui);
+  }
+  .svc-name {
+    position: relative;
+  }
+  .svc-name::before {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 0.58em;
+    width: 12px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-teal);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform var(--dur-ui) var(--ease-ui);
+  }
+  .svc-row[data-active="true"] .svc-main {
+    transform: translateX(20px);
+  }
+  .svc-row[data-active="true"] .svc-name::before {
+    transform: scaleX(1);
   }
   .svc-preview {
     display: block;

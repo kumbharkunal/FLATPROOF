@@ -1,8 +1,8 @@
 import { ironbow } from "@/lib/ironbow";
 
 // The hero room as an architectural line drawing, shown until the AI photos arrive.
-// Same composition as the photo prompts (IMAGE_PROMPTS.md): calm left wall for the headline,
-// sliding window over a black granite sill, switchboard on the right wall, skirting, tiled floor.
+// Same elements as the photo prompts (IMAGE_PROMPTS.md): calm left wall for the headline,
+// sliding window over a black granite sill, a switchboard, skirting, tiled floor.
 // `thermal` renders the same geometry as a thermal image for the lens and the Thermal view.
 
 type V2 = readonly [number, number];
@@ -16,7 +16,8 @@ type Geo = {
   vp: V2;
   win: { x1: number; x2: number; y1: number; y2: number };
   sillOver: number;
-  plate: { u0: number; u1: number; v0: number; v1: number };
+  /** Switchboard plate: frontal on the back wall (drawing units) or on the right wall (u, v). */
+  plate: { wall: "back"; x: number; y: number; w: number; h: number } | { wall: "right"; u0: number; u1: number; v0: number; v1: number };
   rows: number[];
   cols: number;
   /** Thermal anomaly centres and radii, in drawing units. */
@@ -25,19 +26,21 @@ type Geo = {
   tile: { cx: number; cy: number; rx: number; ry: number };
 };
 
+// Desktop: the back wall starts right of the headline column (49.5% across) and every finding
+// sits between 61% and 78% across, so all four stay in frame on screens as narrow as 5:4.
 const DESKTOP: Geo = {
   W: 1600,
   H: 900,
-  back: { x1: 640, x2: 1240, y1: 75, y2: 675 },
-  vp: [940, 375],
-  win: { x1: 790, x2: 1210, y1: 150, y2: 398 },
-  sillOver: 20,
-  plate: { u0: 0.36, u1: 0.47, v0: 0.585, v1: 0.655 },
-  rows: [700, 742, 806, 900],
+  back: { x1: 792, x2: 1312, y1: 95, y2: 655 },
+  vp: [1052, 375],
+  win: { x1: 832, x2: 1120, y1: 165, y2: 395 },
+  sillOver: 18,
+  plate: { wall: "back", x: 1180, y: 472, w: 86, h: 46 },
+  rows: [692, 741, 808, 900],
   cols: 6,
-  damp: { cx: 1150, cy: 640, rx: 120, ry: 62 },
-  socketRx: 26,
-  tile: { cx: 1290, cy: 812, rx: 120, ry: 34 },
+  damp: { cx: 1110, cy: 622, rx: 110, ry: 58 },
+  socketRx: 24,
+  tile: { cx: 1237, cy: 773, rx: 78, ry: 28 },
 };
 
 const MOBILE: Geo = {
@@ -47,7 +50,7 @@ const MOBILE: Geo = {
   vp: [400, 440],
   win: { x1: 215, x2: 585, y1: 165, y2: 296 },
   sillOver: 16,
-  plate: { u0: 0.27, u1: 0.43, v0: 0.585, v1: 0.655 },
+  plate: { wall: "right", u0: 0.27, u1: 0.43, v0: 0.585, v1: 0.655 },
   rows: [790, 835, 905, 1000],
   cols: 6,
   damp: { cx: 548, cy: 728, rx: 96, ry: 52 },
@@ -68,8 +71,19 @@ function build(g: Geo) {
   const lTop = (u: number) => lerp(TL, [0, 0], u);
   const lBot = (u: number) => lerp(BL, [0, H], u);
   const L = (u: number, v: number) => lerp(lTop(u), lBot(u), v);
-  const plate = [R(g.plate.u0, g.plate.v0), R(g.plate.u1, g.plate.v0), R(g.plate.u1, g.plate.v1), R(g.plate.u0, g.plate.v1)] as const;
-  const plateC = R((g.plate.u0 + g.plate.u1) / 2, (g.plate.v0 + g.plate.v1) / 2);
+  const gp = g.plate;
+  const plate: readonly [V2, V2, V2, V2] =
+    gp.wall === "right"
+      ? [R(gp.u0, gp.v0), R(gp.u1, gp.v0), R(gp.u1, gp.v1), R(gp.u0, gp.v1)]
+      : [
+          [gp.x, gp.y],
+          [gp.x + gp.w, gp.y],
+          [gp.x + gp.w, gp.y + gp.h],
+          [gp.x, gp.y + gp.h],
+        ];
+  // A point on the plate, u across and v down (bilinear, so it follows the wall's perspective).
+  const P = (u: number, v: number) => lerp(lerp(plate[0], plate[1], u), lerp(plate[3], plate[2], u), v);
+  const plateC = P(0.5, 0.5);
   // Floor: depth lines from the back floor line toward the viewer.
   const toFront = (p: V2): V2 => {
     const t = (H - g.vp[1]) / (p[1] - g.vp[1]);
@@ -84,7 +98,7 @@ function build(g: Geo) {
   const floorEdgeR = (y: number): V2 => lerp(BR, [W, H], (y - back.y2) / (H - back.y2));
   const rows = g.rows.map((y) => [floorEdgeL(y), floorEdgeR(y)] as const);
   const sk = 0.032; // skirting height as a share of wall height
-  return { BL, BR, TL, TR, R, L, plate, plateC, depth, rows, sk };
+  return { BL, BR, TL, TR, R, L, plate, P, plateC, depth, rows, sk };
 }
 
 const PAPER = {
@@ -243,16 +257,29 @@ export function RoomLinework({
         <rect x={win.x1 - g.sillOver - 8} y={win.y2 + 9} width={win.x2 - win.x1 + (g.sillOver + 8) * 2} height={layout === "desktop" ? 14 : 12} fill={thermal ? ironbow(0.55) : PAPER.sill} />
       </g>
 
-      {/* Switches and the 16A socket */}
-      <g fill="none" stroke={lineColor} strokeWidth={sw * 0.8} vectorEffect="non-scaling-stroke">
-        {[0.14, 0.3, 0.46, 0.62].map((u) => {
-          const p = lerp(lerp(b.plate[0], b.plate[1], u), lerp(b.plate[3], b.plate[2], u), 0.5);
-          return <rect key={u} x={p[0] - 4} y={p[1] - 9} width={8} height={18} rx={1.5} />;
-        })}
+      {/* Four rocker switches and the round three-pin 16A socket, in the plate's own perspective */}
+      <g fill="none" stroke={lineColor} strokeWidth={sw * 0.8} strokeLinejoin="round" vectorEffect="non-scaling-stroke">
+        {[0.07, 0.21, 0.35, 0.49].map((u) => (
+          <polygon key={u} points={pts(b.P(u, 0.24), b.P(u + 0.1, 0.24), b.P(u + 0.1, 0.76), b.P(u, 0.76))} />
+        ))}
         {(() => {
-          const p = lerp(lerp(b.plate[0], b.plate[1], 0.83), lerp(b.plate[3], b.plate[2], 0.83), 0.5);
-          return <circle cx={p[0]} cy={p[1]} r={layout === "desktop" ? 11 : 9} />;
+          const c = b.P(0.8, 0.5);
+          const half = (a: V2, z: V2) => Math.hypot(z[0] - a[0], z[1] - a[1]) / 2;
+          // The plate is about twice as wide as it is tall, so 0.13 across matches 0.26 down.
+          return <ellipse cx={c[0]} cy={c[1]} rx={half(b.P(0.67, 0.5), b.P(0.93, 0.5))} ry={half(b.P(0.8, 0.24), b.P(0.8, 0.76))} />;
         })()}
+      </g>
+      <g fill={lineColor}>
+        {(
+          [
+            [0.8, 0.37],
+            [0.765, 0.62],
+            [0.835, 0.62],
+          ] as const
+        ).map(([u, v]) => {
+          const c = b.P(u, v);
+          return <circle key={`${u}-${v}`} cx={c[0]} cy={c[1]} r={layout === "desktop" ? 1.9 : 1.2} />;
+        })}
       </g>
 
       {/* Floor tiles */}
@@ -265,8 +292,10 @@ export function RoomLinework({
         ))}
       </g>
 
-      {/* Recessed ceiling light */}
-      <ellipse cx={(back.x1 + back.x2) / 2} cy={back.y1 * 0.5} rx={layout === "desktop" ? 34 : 26} ry={6} fill="none" stroke={faint} strokeWidth={sw} vectorEffect="non-scaling-stroke" />
+      {/* Recessed ceiling light (phone crop only: on desktop the nav pill sits over the ceiling) */}
+      {layout === "mobile" && (
+        <ellipse cx={(back.x1 + back.x2) / 2} cy={back.y1 * 0.5} rx={26} ry={6} fill="none" stroke={faint} strokeWidth={sw} vectorEffect="non-scaling-stroke" />
+      )}
     </svg>
   );
 }

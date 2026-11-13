@@ -1,4 +1,5 @@
 import { site } from "@/content/site";
+import { ironbow } from "@/lib/ironbow";
 import { Logo } from "@/components/brand/Logo";
 import { WhatsAppButton } from "@/components/ui/Button";
 import { ReportMotion } from "./ReportMotion";
@@ -44,6 +45,28 @@ export function Report() {
             {s.findings.map((f) => (
               <li key={f.title} className="finding" data-sev={f.severity}>
                 <span className="finding-thumb" data-kind={f.thumb} aria-hidden="true">
+                  {f.thumb === "thermal" && (
+                    // A thermal frame of the skirting: warm wall, the cold damp patch rising from
+                    // the skirting line, and the camera's reticle on it.
+                    <svg viewBox="0 0 48 48">
+                      <defs>
+                        <linearGradient id="thumb-wall" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0" stopColor={ironbow(0.74)} />
+                          <stop offset="1" stopColor={ironbow(0.54)} />
+                        </linearGradient>
+                        <radialGradient id="thumb-cold">
+                          <stop offset="0" stopColor={ironbow(0.04)} />
+                          <stop offset="0.55" stopColor={ironbow(0.2)} stopOpacity="0.85" />
+                          <stop offset="1" stopColor={ironbow(0.4)} stopOpacity="0" />
+                        </radialGradient>
+                      </defs>
+                      <rect width="48" height="48" fill="url(#thumb-wall)" />
+                      <rect y="36" width="48" height="12" fill={ironbow(0.34)} />
+                      <ellipse cx="27" cy="31" rx="16" ry="12" fill="url(#thumb-cold)" />
+                      <path d="M0 33h48M0 36h48" stroke="rgb(255 255 255 / 0.4)" strokeWidth="1" />
+                      <path d="M27 24.5v4M27 33.5v4M20.5 31h4M29.5 31h4" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" />
+                    </svg>
+                  )}
                   {f.thumb === "socket" && (
                     <svg viewBox="0 0 48 48">
                       <rect x="6" y="6" width="36" height="36" rx="6" />

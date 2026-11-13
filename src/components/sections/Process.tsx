@@ -34,9 +34,12 @@ export function Process() {
                     <span>Snag report</span>
                     <span className="mini-count num">18</span>
                   </span>
-                  <span className="mini-row" data-sev="critical" />
-                  <span className="mini-row" data-sev="medium" />
-                  <span className="mini-row" data-sev="audit" />
+                  {/* More rows than fit: the list fades out, like the rest of the 18. */}
+                  <span className="mini-rows">
+                    {(["critical", "medium", "audit", "medium", "critical", "medium"] as const).map((sev, k) => (
+                      <span key={k} className="mini-row" data-sev={sev} />
+                    ))}
+                  </span>
                   <span className="mini-link">{p.reportLink.label}</span>
                 </a>
               )}

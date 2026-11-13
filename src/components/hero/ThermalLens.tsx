@@ -9,10 +9,10 @@ import type { LensCopy, LensFinding, LensGrid } from "./types";
 
 // Cloud radii per finding, in % of the image width: [rx, ry] for desktop (d) and phone (m) crops.
 const CLOUD: Record<LensFinding["id"], { d: [number, number]; m: [number, number] }> = {
-  damp: { d: [8.5, 4.2], m: [14, 6.5] },
-  socket: { d: [2.8, 2.4], m: [6, 5] },
-  tile: { d: [7, 2.4], m: [15, 4.6] },
-  sill: { d: [15, 2], m: [28, 3.6] },
+  damp: { d: [7.5, 3.8], m: [14, 6.5] },
+  socket: { d: [3.7, 2.4], m: [6, 5] },
+  tile: { d: [5.2, 2.5], m: [15, 4.6] },
+  sill: { d: [12.6, 2], m: [28, 3.6] },
 };
 
 type Props = {
@@ -71,7 +71,8 @@ export function ThermalLens({ findings, grids, copy, intro, base, full, lens }: 
     engine.current?.focus(id);
   };
 
-  const chipFinding = findings.find((f) => f.id === chip);
+  // While the chip fades out after a lock, it keeps naming the last finding.
+  const chipFinding = findings.find((f) => f.id === (chip ?? current));
   const showAll = thermal || mode === "static";
 
   return (
@@ -83,6 +84,21 @@ export function ThermalLens({ findings, grids, copy, intro, base, full, lens }: 
       data-thermal={thermal ? "on" : "off"}
     >
       {intro}
+      {/* The panel comes before the stage in the DOM so keyboard focus runs: switch on Thermal
+          view, then straight into the four findings. On stacked layouts CSS `order` still shows
+          the stage first. */}
+      <LensPanel
+        copy={copy}
+        findings={findings}
+        found={found}
+        current={current}
+        touch={touch}
+        mode={mode}
+        thermal={thermal}
+        paused={paused}
+        onThermal={toggleThermal}
+        onPause={() => setPaused((v) => !v)}
+      />
       <div className="hero-stage" data-cursor-hide>
         <div className="cover stage-base">{base}</div>
         <div className="stage-thermal" aria-hidden="true">
@@ -153,19 +169,6 @@ export function ThermalLens({ findings, grids, copy, intro, base, full, lens }: 
           {copy.caption}
         </p>
       </div>
-
-      <LensPanel
-        copy={copy}
-        findings={findings}
-        found={found}
-        current={current}
-        touch={touch}
-        mode={mode}
-        thermal={thermal}
-        paused={paused}
-        onThermal={toggleThermal}
-        onPause={() => setPaused((v) => !v)}
-      />
     </div>
   );
 }

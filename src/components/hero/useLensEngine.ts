@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type RefObject } from "react";
 import { gsap, useGSAP, MQ } from "@/lib/gsap";
+import { HERO_WIDE } from "./layout";
 import type { LensFinding, LensGrid } from "./types";
 
 export type Engine = {
@@ -39,7 +40,7 @@ export function useLensEngine(
     () => {
       const mm = gsap.matchMedia();
       // `reduce` is listed so the callback always runs (matchMedia skips it when nothing matches).
-      mm.add({ motion: MQ.motion, reduce: MQ.reduce, fine: MQ.fine, desk: MQ.desktop }, (ctx) => {
+      mm.add({ motion: MQ.motion, reduce: MQ.reduce, fine: MQ.fine, desk: HERO_WIDE }, (ctx) => {
         const { motion, fine, desk } = ctx.conditions as Record<string, boolean>;
         if (!motion) {
           cbRef.current.onMode("static", !fine);

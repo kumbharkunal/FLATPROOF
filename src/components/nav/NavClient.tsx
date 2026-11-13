@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap, loadST } from "@/lib/gsap";
+import { ANCHOR_EVENT } from "@/lib/scroll";
 import { Logo } from "@/components/brand/Logo";
 import { WaChip } from "@/components/ui/WaChip";
 import type { MobileMenu as MobileMenuType } from "./MobileMenu";
@@ -36,6 +37,17 @@ export function NavClient({ data }: { data: NavData }) {
   const [menuMounted, setMenuMounted] = useState(false);
   const linksRef = useRef<HTMLElement>(null);
   const indicator = useRef<HTMLSpanElement>(null);
+  // After an in-page link (goTo announces it), the pill stays put through the smooth scroll, so the
+  // reader arrives with the nav in view instead of an empty band where it was.
+  const holdUntil = useRef(0);
+  useEffect(() => {
+    const onAnchor = () => {
+      holdUntil.current = performance.now() + 1600;
+      setHidden(false);
+    };
+    window.addEventListener(ANCHOR_EVENT, onAnchor);
+    return () => window.removeEventListener(ANCHOR_EVENT, onAnchor);
+  }, []);
 
   // Sliding active-link indicator: one pill that FLIPs to the active link with the Web Animations
   // API (transform only). Keeps Motion out of first-load JS (FP-D44).
@@ -106,6 +118,10 @@ export function NavClient({ data }: { data: NavData }) {
           start: 0,
           end: "max",
           onUpdate: (self) => {
+            if (performance.now() < holdUntil.current) {
+              last = 0;
+              return;
+            }
             const pastHero = self.scroll() > (document.getElementById("top")?.offsetHeight ?? innerHeight) * 0.9;
             const dir = self.direction;
             const next = pastHero && dir === 1 && !focusInside.current;

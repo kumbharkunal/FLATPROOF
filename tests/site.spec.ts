@@ -169,7 +169,10 @@ test("thermal view switch works from the keyboard", async ({ page }) => {
   await expect(sw).toHaveAttribute("aria-checked", "true");
   await expect(page.locator(".tally")).toContainText("Found 4 of 4");
   await expect(page.locator(".hero-lens")).toHaveAttribute("data-thermal", "on");
+  // Focus goes from the switch into the findings (past the selected finding's link, if one is open).
   await page.keyboard.press("Tab");
+  if (await page.evaluate(() => !!document.activeElement?.closest(".hero-panel"))) await page.keyboard.press("Tab");
+  await expect(page.locator(".marker").first()).toBeFocused();
   await expect(page.locator(".marker").first()).toBeVisible();
 });
 

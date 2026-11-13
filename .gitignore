@@ -41,7 +41,9 @@ next-env.d.ts
 /reference/
 /.design-refs/
 /.taste-skill/
-/.gstack/
+# gstack's local state stays out; its test-lane policy (src -> Playwright suite) is tracked
+/.gstack/*
+!/.gstack/pregate.json
 /.jury/
 /scrollcraft/
 
