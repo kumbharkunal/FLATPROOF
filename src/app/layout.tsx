@@ -6,7 +6,9 @@ import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { Nav } from "@/components/nav/Nav";
 import { Cursor } from "@/components/cursor/Cursor";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
+import { Footer } from "@/components/sections/Footer";
 import "./globals.css";
+import "./sections.css";
 
 // One variable family: width 125 for display, 100 for text (FP-D3).
 const zalando = Zalando_Sans({
@@ -63,6 +65,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SmoothScroll />
         <Nav />
         {children}
+        <Footer />
         <FloatingWhatsApp />
         <Cursor />
       </body>

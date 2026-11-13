@@ -1,31 +1,29 @@
 import { Hero } from "@/components/hero/Hero";
+import { Stakes } from "@/components/sections/Stakes";
+import { Checks } from "@/components/sections/Checks";
+import { Process } from "@/components/sections/Process";
+import { Report } from "@/components/sections/Report";
+import { CarpetArea } from "@/components/sections/CarpetArea";
+import { CaseFile } from "@/components/sections/CaseFile";
+import { Services } from "@/components/sections/Services";
+import { Faq } from "@/components/sections/Faq";
+import { FinalCta } from "@/components/sections/FinalCta";
 
+// Beneath the finish: the bright surface (hero), what hides under it (stakes, checks), how it is
+// found (process), the proof (report, carpet area, case file), then everything else and booking.
 export default function Home() {
   return (
     <main id="main">
       <Hero />
-      {/* Sections land in M6 to M8 (docs/PROGRESS.md). Temporary grounds for nav-theme testing. */}
-      <section id="stakes" data-nav="dark" className="section-y bg-ink text-paper">
-        <div className="container-x type-h2">Stakes</div>
-      </section>
-      <section id="checks" data-nav="dark" className="section-y bg-navy text-paper">
-        <div className="container-x type-h2">Checks</div>
-      </section>
-      <section id="process" data-nav="light" className="section-y bg-mist">
-        <div className="container-x type-h2">How it works</div>
-      </section>
-      <section id="report" data-nav="light" className="section-y">
-        <div className="container-x type-h2">Report</div>
-      </section>
-      <section id="services" data-nav="light" className="section-y bg-mist">
-        <div className="container-x type-h2">Services</div>
-      </section>
-      <section id="faq" data-nav="light" className="section-y">
-        <div className="container-x type-h2">FAQ</div>
-      </section>
-      <section id="book" data-nav="dark" className="section-y bg-navy text-paper">
-        <div className="container-x type-h2">Book</div>
-      </section>
+      <Stakes />
+      <Checks />
+      <Process />
+      <Report />
+      <CarpetArea />
+      <CaseFile />
+      <Services />
+      <Faq />
+      <FinalCta />
     </main>
   );
 }

@@ -177,14 +177,15 @@
   font-weight: 600;
   letter-spacing: 0.01em;
 }
+/* Proportional lining figures: Zalando Sans tabular figures slash the zero and widen spaces (FP-D39). */
 @utility type-figure {
   font-weight: 660;
   font-variation-settings: "wdth" 125;
-  font-variant-numeric: tabular-nums lining-nums;
+  font-variant-numeric: lining-nums proportional-nums;
   letter-spacing: -0.02em;
 }
 @utility num {
-  font-variant-numeric: tabular-nums lining-nums;
+  font-variant-numeric: lining-nums proportional-nums;
 }
 
 /* ------------------------------------------------------------------ layout */
@@ -273,12 +274,14 @@
   min-height: 52px;
   padding: 0 22px;
   border-radius: var(--radius-pill);
+  max-width: 100%;
+  padding-block: 8px;
   font-size: 0.9375rem;
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1.2;
   letter-spacing: 0.005em;
   text-decoration: none;
-  white-space: nowrap;
+  text-align: left;
   transition:
     background-color var(--dur-ui) var(--ease-ui),
     color var(--dur-ui) var(--ease-ui),
@@ -872,7 +875,6 @@ html.cursor-on .cursor {
   font-size: 0.8125rem;
   font-weight: 700;
   color: var(--color-ink);
-  font-variant-numeric: tabular-nums;
 }
 .marker[data-shown="false"] {
   opacity: 0;
