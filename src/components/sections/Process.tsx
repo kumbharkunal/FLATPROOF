@@ -29,7 +29,7 @@ export function Process() {
               {s.image ? (
                 <Photo slot={s.image as "tap-test" | "engineer-thermal"} sizes="(max-width: 1023px) 100vw, 400px" className="step-photo" />
               ) : (
-                <a href={p.reportLink.href} className="mini-report" aria-label={p.reportLink.label}>
+                <a href={p.reportLink.href} className="mini-report">
                   <span className="mini-head">
                     <span>Snag report</span>
                     <span className="mini-count num">18</span>

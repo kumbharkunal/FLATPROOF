@@ -38,7 +38,8 @@ export function useLensEngine(
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
-      mm.add({ motion: MQ.motion, fine: MQ.fine, desk: MQ.desktop }, (ctx) => {
+      // `reduce` is listed so the callback always runs (matchMedia skips it when nothing matches).
+      mm.add({ motion: MQ.motion, reduce: MQ.reduce, fine: MQ.fine, desk: MQ.desktop }, (ctx) => {
         const { motion, fine, desk } = ctx.conditions as Record<string, boolean>;
         if (!motion) {
           cbRef.current.onMode("static", !fine);

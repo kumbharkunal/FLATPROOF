@@ -297,10 +297,33 @@
 .acc-icon[data-open="true"]::after {
   transform: rotate(0deg);
 }
-.acc-panel {
+/* CSS disclosure: rows animate 0fr to 1fr; the inner box clips (FP-D44). */
+.disclose {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 270ms var(--ease-out),
+    opacity 200ms var(--ease-ui);
+}
+[data-open="true"] > .disclose {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows 420ms var(--ease-out),
+    opacity 300ms var(--ease-ui);
+}
+.disclose-inner {
+  min-height: 0;
   overflow: hidden;
 }
-.acc-panel .check-list {
+@media (prefers-reduced-motion: reduce) {
+  .disclose,
+  [data-open="true"] > .disclose {
+    transition: none;
+  }
+}
+.acc-item .check-list {
   margin: 0;
   padding: 0 0 22px 46px;
 }
@@ -1075,9 +1098,6 @@
 }
 .faq-q:hover {
   color: var(--color-teal-ink);
-}
-.faq-a {
-  overflow: hidden;
 }
 .faq-a p {
   max-width: 62ch;

@@ -14,11 +14,11 @@ export function StakesMotion() {
     let dead = false;
     loadSplit().then((SplitText) => {
       if (dead) return;
-      const s = SplitText.create(body, { type: "words", wordsClass: "w", aria: "auto" });
+      const s = SplitText.create(body, { type: "words", wordsClass: "w", tag: "span", aria: "none" });
       split = s;
-      gsap.set(s.words, { opacity: 0.16 });
+      gsap.set(s.words, { opacity: 0.38 });
       tl = gsap.timeline({
-        scrollTrigger: { trigger: body, start: "top 78%", end: "bottom 45%", scrub: true },
+        scrollTrigger: { trigger: body, start: "top 80%", end: "bottom 62%", scrub: true },
       });
       tl.to(s.words, { opacity: 1, ease: "none", stagger: 0.12, duration: 0.6 });
       section.querySelectorAll<HTMLElement>(".mark").forEach((m) => {

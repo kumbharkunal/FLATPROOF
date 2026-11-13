@@ -141,9 +141,6 @@ export function RoomLinework({
         </clipPath>
         {thermal && (
           <>
-            <filter id={id("soft")} x="-10%" y="-10%" width="120%" height="120%">
-              <feGaussianBlur stdDeviation={layout === "desktop" ? 9 : 7} />
-            </filter>
             {(
               [
                 ["g-ceil", 0.71, 0.63],
@@ -178,7 +175,7 @@ export function RoomLinework({
       </defs>
 
       {/* Planes */}
-      <g filter={thermal ? `url(#${id("soft")})` : undefined}>
+      <g>
         <polygon points={pts([0, 0], [W, 0], b.TR, b.TL)} fill={thermal ? `url(#${id("g-ceil")})` : PAPER.plane.ceiling} />
         <polygon points={pts([0, 0], b.TL, b.BL, [0, H])} fill={thermal ? `url(#${id("g-left")})` : PAPER.plane.left} />
         <rect x={back.x1} y={back.y1} width={back.x2 - back.x1} height={back.y2 - back.y1} fill={thermal ? `url(#${id("g-back")})` : PAPER.plane.back} />

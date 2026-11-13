@@ -39,6 +39,22 @@ export function loadSplit(): Promise<SplitType> {
   return splitPromise;
 }
 
+/**
+ * Re-measure every trigger once scenes have been built (a pin adds scroll distance, which moves
+ * the triggers below it). Debounced so many scenes cause one refresh; sort() orders by position.
+ */
+let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+export function scheduleRefresh() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(() => {
+    refreshTimer = null;
+    loadST().then((ST) => {
+      ST.sort();
+      ST.refresh();
+    });
+  }, 60);
+}
+
 /** Media conditions shared by every gsap.matchMedia() call. */
 export const MQ = {
   motion: "(prefers-reduced-motion: no-preference)",

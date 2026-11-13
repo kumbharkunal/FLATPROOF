@@ -22,7 +22,8 @@ export function Checks() {
             <p className="type-lead checks-intro">{c.intro}</p>
           </div>
           <div className="checks-count">
-            <p className="odometer type-figure" aria-label={`${c.total}+ ${c.unit}`}>
+            <p className="odometer type-figure">
+              <span className="sr-only">{`${c.total}+ ${c.unit}`}</span>
               {digits.map((d, i) => (
                 <span key={i} className="odo-col" aria-hidden="true">
                   <span className="odo-strip" style={{ "--d": Number(d) } as React.CSSProperties}>

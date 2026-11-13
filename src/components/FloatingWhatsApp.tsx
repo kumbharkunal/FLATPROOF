@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { site, waHref } from "@/content/site";
 import { gsap, loadST } from "@/lib/gsap";
 import { WhatsappIcon } from "@/components/brand-icons/whatsapp";
 
 // Appears once the hero has scrolled away; hides while the closing call to action is on screen.
-export function FloatingWhatsApp() {
+export function FloatingWhatsApp({ href, label }: { href: string; label: string }) {
   const [pastHero, setPastHero] = useState(false);
   const [atClose, setAtClose] = useState(false);
 
@@ -39,7 +38,7 @@ export function FloatingWhatsApp() {
   const visible = pastHero && !atClose;
   return (
     <a
-      href={waHref("book")}
+      href={href}
       className="float-wa"
       data-visible={visible ? "true" : "false"}
       aria-hidden={visible ? undefined : true}
@@ -50,9 +49,9 @@ export function FloatingWhatsApp() {
     >
       <WhatsappIcon className="size-7" idPrefix="wa-float" />
       <span className="float-wa-label" aria-hidden="true">
-        {site.floatingWa.label}
+        {label}
       </span>
-      <span className="sr-only">{site.floatingWa.label} (opens in a new tab)</span>
+      <span className="sr-only">{label} (opens in a new tab)</span>
     </a>
   );
 }

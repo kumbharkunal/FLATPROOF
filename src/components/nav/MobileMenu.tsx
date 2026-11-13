@@ -1,23 +1,23 @@
 "use client";
 
-import { AnimatePresence, m, useReducedMotion } from "motion/react";
+import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
 import { useLenis } from "lenis/react";
 import { useEffect, useRef, type RefObject } from "react";
-import { site, waHref } from "@/content/site";
+import type { NavData } from "./NavClient";
 import { goTo } from "@/lib/scroll";
 import { EASE } from "@/lib/motion";
 import { Logo } from "@/components/brand/Logo";
-import { WaChip } from "@/components/ui/Button";
+import { WaChip } from "@/components/ui/WaChip";
 import { InstagramIcon } from "@/components/brand-icons/instagram";
 
 const SPRING = { type: "spring", stiffness: 420, damping: 38 } as const;
 const PILL = "inset(0px 0px calc(100% - 64px) 0px round 32px)";
 const FULL = "inset(0px 0px 0% 0px round 28px)";
 
-type Props = { open: boolean; onClose: () => void; returnFocus: RefObject<HTMLButtonElement | null> };
+type Props = { open: boolean; onClose: () => void; returnFocus: RefObject<HTMLButtonElement | null>; data: NavData };
 
 // Modal dialog that grows out of the nav pill (clip-path only; the blur never animates).
-export function MobileMenu({ open, onClose, returnFocus }: Props) {
+export function MobileMenu({ open, onClose, returnFocus, data }: Props) {
   const lenis = useLenis();
   const reduce = useReducedMotion();
   const sheet = useRef<HTMLDivElement>(null);
@@ -80,6 +80,7 @@ export function MobileMenu({ open, onClose, returnFocus }: Props) {
   const d = reduce ? 0 : 1;
 
   return (
+    <LazyMotion features={domAnimation}>
     <AnimatePresence>
       {open && (
         <>
@@ -111,14 +112,14 @@ export function MobileMenu({ open, onClose, returnFocus }: Props) {
                 <Logo height={36} dark />
               </span>
               <button type="button" className="nav-menu-btn" onClick={onClose}>
-                <span className="sr-only">{site.nav.close}</span>
+                <span className="sr-only">{data.close}</span>
                 <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none">
                   <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
             </div>
             <nav aria-label="Menu" className="menu-links">
-              {site.nav.links.map((l, i) => (
+              {data.links.map((l, i) => (
                 <m.a
                   key={l.href}
                   href={l.href}
@@ -135,16 +136,16 @@ export function MobileMenu({ open, onClose, returnFocus }: Props) {
               initial={{ opacity: 0, y: 12 * d }}
               animate={{ opacity: 1, y: 0, transition: { ...SPRING, delay: d * 0.32 } }}
             >
-              <a href={waHref("book")} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
+              <a href={data.bookHref} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
                 <WaChip />
-                <span>{site.nav.cta}</span>
+                <span>{data.cta}</span>
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
               <div className="row">
-                <a href={site.contact.phone.href} className="btn btn-secondary-dark">
-                  Call {site.contact.phone.display}
+                <a href={data.phone.href} className="btn btn-secondary-dark">
+                  Call {data.phone.display}
                 </a>
-                <a href={site.contact.instagram.href} className="btn btn-secondary-dark" target="_blank" rel="noopener noreferrer">
+                <a href={data.instagram} className="btn btn-secondary-dark" target="_blank" rel="noopener noreferrer">
                   <InstagramIcon className="size-5" idPrefix="ig-menu" />
                   <span>Instagram</span>
                   <span className="sr-only"> (opens in a new tab)</span>
@@ -155,5 +156,6 @@ export function MobileMenu({ open, onClose, returnFocus }: Props) {
         </>
       )}
     </AnimatePresence>
+    </LazyMotion>
   );
 }

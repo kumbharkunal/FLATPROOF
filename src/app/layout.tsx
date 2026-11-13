@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Zalando_Sans } from "next/font/google";
 import localFont from "next/font/local";
-import { site } from "@/content/site";
+import { site, waHref } from "@/content/site";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { Nav } from "@/components/nav/Nav";
 import { Cursor } from "@/components/cursor/Cursor";
@@ -66,7 +66,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Nav />
         {children}
         <Footer />
-        <FloatingWhatsApp />
+        <FloatingWhatsApp href={waHref("book")} label={site.floatingWa.label} />
         <Cursor />
       </body>
     </html>
