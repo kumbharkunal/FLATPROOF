@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { Zalando_Sans } from "next/font/google";
 import localFont from "next/font/local";
 import { site } from "@/content/site";
+import { SmoothScroll } from "@/components/providers/SmoothScroll";
+import { Nav } from "@/components/nav/Nav";
+import { Cursor } from "@/components/cursor/Cursor";
+import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import "./globals.css";
 
 // One variable family: width 125 for display, 100 for text (FP-D3).
@@ -52,7 +56,16 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-IN" className={`${zalando.variable} ${rupee.variable}`}>
-      <body>{children}</body>
+      <body>
+        <a href="#main" className="skip-link">
+          {site.nav.skip}
+        </a>
+        <SmoothScroll />
+        <Nav />
+        {children}
+        <FloatingWhatsApp />
+        <Cursor />
+      </body>
     </html>
   );
 }

@@ -124,9 +124,9 @@ export const site = {
       pause: "Pause scan",
       play: "Play scan",
       scanning: "Scanning",
-      found: (n: number, total: number) => `Found ${n} of ${total}`,
+      found: "Found {n} of {total}",
       complete: "Your inspection covers 125+ points.",
-      completeLink: { label: "See the checks", href: "#checks" },
+      completeLink: { label: "See all 125+ checks", href: "#checks" },
       caption: "Simulated scan for illustration. The defects are real ones from our checklist and site visits.",
       srIntro: "What the thermal camera finds in this room",
       stageLabel: "A new flat with four hidden defects. Use the Thermal view switch to see all of them.",
@@ -142,8 +142,8 @@ export const site = {
         at: {
           desktop: { x: 72, y: 77 },
           mobile: { x: 70, y: 77 },
-          lineworkDesktop: { x: 71.5, y: 76.5 },
-          lineworkMobile: { x: 69, y: 76.5 },
+          lineworkDesktop: { x: 71.9, y: 73.2 },
+          lineworkMobile: { x: 68.5, y: 74.4 },
         },
       },
       {
@@ -156,8 +156,8 @@ export const site = {
         at: {
           desktop: { x: 86, y: 55 },
           mobile: { x: 85, y: 55 },
-          lineworkDesktop: { x: 87.4, y: 55.6 },
-          lineworkMobile: { x: 86, y: 55.5 },
+          lineworkDesktop: { x: 86.8, y: 54.8 },
+          lineworkMobile: { x: 87, y: 55.3 },
         },
       },
       {
@@ -170,7 +170,7 @@ export const site = {
         at: {
           desktop: { x: 80, y: 90 },
           mobile: { x: 48, y: 90 },
-          lineworkDesktop: { x: 80.5, y: 90 },
+          lineworkDesktop: { x: 80.6, y: 90.2 },
           lineworkMobile: { x: 50, y: 90.5 },
         },
       },
@@ -184,8 +184,8 @@ export const site = {
         at: {
           desktop: { x: 62, y: 45.5 },
           mobile: { x: 50, y: 30.5 },
-          lineworkDesktop: { x: 62.5, y: 45.6 },
-          lineworkMobile: { x: 50, y: 30.6 },
+          lineworkDesktop: { x: 62.5, y: 44.9 },
+          lineworkMobile: { x: 50, y: 30.2 },
         },
       },
     ] satisfies Finding[],
@@ -262,7 +262,7 @@ export const site = {
         ],
       },
     ],
-    examplesLabel: (count: number) => `Some of the ${count} checks`,
+    examplesLabel: "Some of the {count} checks",
     cta: { label: "Get the full checklist on WhatsApp", wa: "checklist" as WaKey },
   },
 
@@ -352,7 +352,7 @@ export const site = {
       label: "Your agreement rate",
       unit: "₹ per sq ft",
       placeholder: "Rate per sq ft",
-      result: (rupees: string) => `${rupees} paid for area you didn’t get`,
+      result: "{rupees} paid for area you didn’t get",
       empty: "Enter your rate to see what 31.60 sq ft is worth.",
     },
     note: "Plan is illustrative. Figures from sample report FP-PUNE-2026-088.",
@@ -460,7 +460,7 @@ export const site = {
       },
       {
         q: "How do I book?",
-        a: "Message or call +91 96575 55588 on WhatsApp, or DM “INSPECT” to @flatproof.inspections on Instagram.",
+        a: "WhatsApp or call +91 96575 55588, or DM “INSPECT” to @flatproof.inspections on Instagram.",
         show: true,
       },
       // Hidden until the client confirms the answer (CLIENT_QUESTIONS.md):
@@ -480,7 +480,7 @@ export const site = {
     primary: { label: "Book on WhatsApp", wa: "book" as WaKey },
     call: "Call",
     email: "Email",
-    dm: (keyword: string) => `DM “${keyword}” on Instagram`,
+    dm: "DM “{keyword}” on Instagram",
   },
 
   footer: {
