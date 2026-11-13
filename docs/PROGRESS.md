@@ -14,14 +14,16 @@ Resume point for any new session or after compaction: read `docs/BRIEF.md`, then
 | 7 | Report, Carpet area, Case file | done | |
 | 8 | Services, FAQ, final CTA, footer, 404 | done | |
 | 9 | QA pass 1 and fixes | done | 17/17 Playwright; local Lighthouse mobile 97-98 / 100 / 100; 187 KB gz first-load JS |
-| 10 | QA pass 2, impeccable audit/polish, taste gate, jury, remove one accessory | done (jury runs on the live URL in M11) | FP-D47 to FP-D55. impeccable detect: 0 at 1280 and 390. Real Chrome: keyboard path, anchors, cursor, console clean. 17/17 Playwright; Lighthouse mobile local 98-99 / 100 / 100 (SEO 63 = noindex only); 187.6 KB gz |
-| 11 | README, DESIGN, CLIENT_QUESTIONS, PITCH; prod deploy; live checks | todo | |
+| 10 | QA pass 2, impeccable audit/polish, taste gate, remove one accessory | done | FP-D47 to FP-D55. impeccable detect: 0 at 1280 and 390. Real Chrome: keyboard path, anchors, cursor, console clean. 17/17 Playwright; Lighthouse mobile local 98-99 / 100 / 100 (SEO 63 = noindex only); 187.6 KB gz. The jury pass was not run: it needs a separate critic agent, offered to the user instead |
+| 11 | README, DESIGN, CLIENT_QUESTIONS, PITCH; prod deploy; live checks | done | Live at https://flatproof.vercel.app from main `162439a` (CLI deploy). Launch fixes FP-D56 to FP-D59 (DOM 2,014 to 1,225, static logo, two fonts instead of three). Playwright 17/17 against the live URL; real Chrome desktop pass clean; phone screenshots per section. Lighthouse mobile live, quiet link: 100 / 100 / 100 in four of five runs (one 85), LCP 1.2 to 1.4 s, TBT 30 to 60 ms, CLS 0 to 0.004; runs on a busy link dropped to 73 to 93 (FP-D58) |
 
 ## Log
 - 2026-11-13: Phase A plan approved (daylight hero, reversed logo on dark, references studied). Phase B: M0 to M9 done and pushed; production deployed by CLI.
 - 2026-11-13: QA pass 2 done. Hero recomposed for 5:4 screens and portrait iPads, keyboard order fixed (switch then findings), side stripes and cursor overlap removed, nav kept through jumps, report complete on landing, units glued. The taste consistency checker ran past 10 minutes without printing its table; its saved crops were reviewed one by one instead.
+- 2026-11-13: M11 done. Handover docs written; production deployed four times by CLI (docs, then the three launch fixes). `vercel git connect` retried after the last deploy: still refused (no GitHub App access to the private repo).
 
 ## Open items for the user
-- Give the Vercel GitHub App access to `kumbharkunal/FLATPROOF` (then `vercel git connect` turns on deploys from main).
-- Generate the seven images from IMAGE_PROMPTS.md into `images-inbox/`, then say "images added" (hotspot calibration follows).
-- Client questions: `CLIENT_QUESTIONS.md` (written at M11).
+- Give the Vercel GitHub App access to `kumbharkunal/FLATPROOF` (GitHub, Settings, Applications, Vercel, Configure, Repository access), then run `vercel git connect` or link it under the project's Git settings. Until then, deploy with `vercel deploy --prod`.
+- Generate the seven images from IMAGE_PROMPTS.md into `images-inbox/`, then say "images added" (hotspot calibration with `npm run images -- --debug` follows).
+- Client questions: `CLIENT_QUESTIONS.md` (30 questions).
+- Optional: a jury-style scored review of the live URL (needs a separate critic agent).

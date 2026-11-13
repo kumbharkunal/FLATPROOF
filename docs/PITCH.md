@@ -23,7 +23,7 @@ Eight talking points for walking FlatProof through the demo: what's different fr
 
 6. **Every service books on WhatsApp in one tap, with the right message.** Their own prefilled messages are kept for each service, plus call, email and an Instagram DM. A floating WhatsApp button follows the reader between the hero and the booking section.
 
-7. **Fast, accessible and honest.** On Lighthouse's mobile test (a throttled mid-range phone) it scores 98 to 99 for performance and 100 for accessibility and best practices on our build. It works with a keyboard and a screen reader and respects reduced motion. Every business claim is verified or listed for them to confirm (`CLIENT_QUESTIONS.md`); there are no made-up reviews, ratings, prices or certifications.
+7. **Fast, accessible and honest.** On Lighthouse's mobile test (a throttled mid-range phone) the live site scored 100 for performance in four of five runs, and 100 for accessibility and best practices in every run; the main text appears in about 1.3 seconds and nothing jumps as it loads. It works with a keyboard and a screen reader and respects reduced motion. Every business claim is verified or listed for them to confirm (`CLIENT_QUESTIONS.md`); there are no made-up reviews, ratings, prices or certifications.
 
 8. **Easy to grow.** All text lives in one content file. Seven photos dropped into a folder and one command replace the placeholders and rebuild the thermal views. The VP Constructions lineage and the inspect-then-fix story (waterproofing with a warranty) are already in place for the full site.
 
