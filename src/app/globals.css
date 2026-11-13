@@ -1,10 +1,265 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------
+   Tokens (docs/DESIGN.md). Tailwind's default palette is removed so
+   only these colours exist. Contrast pairs are listed in DESIGN.md.
+   ------------------------------------------------------------------ */
+@theme {
+  --color-*: initial;
+  --color-paper: #ffffff;
+  --color-mist: #eef4f6;
+  --color-ink: #0e1726;
+  --color-ink-raised: #172338;
+  --color-navy: #29374d;
+  --color-navy-raised: #33445e;
+  --color-teal: #0192ab;
+  --color-teal-ink: #016e82;
+  --color-teal-light: #3fc1d6;
+  --color-slate: #55657a;
+  --color-steel: #a7b6c6;
+  --color-line: #d5dfe5;
+  --color-critical: #c4321c;
+  --color-amber: #f59e0b;
+  --color-amber-ink: #a1530a;
+  --color-wa: #25d366;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-sans: var(--font-zalando), var(--font-rupee), "Arial", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-chip: 8px;
+  --radius-input: 12px;
+  --radius-media: 16px;
+  --radius-panel: 24px;
+  --radius-pill: 999px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-ui: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --breakpoint-xs: 25rem;
+}
+
 :root {
+  --dur-press: 120ms;
+  --dur-ui: 220ms;
+  --dur-open: 420ms;
+  --dur-reveal: 700ms;
+  --gutter: clamp(16px, 4.5vw, 56px);
+  --section-y: clamp(88px, 11vw, 168px);
+  --nav-h: 64px;
+  --focus: var(--color-teal);
+  --shadow-float: inset 0 1px 0 rgb(255 255 255 / 0.5), 0 8px 24px -8px rgb(14 23 38 / 0.18);
+  --shadow-sheet: 0 2px 4px rgb(14 23 38 / 0.04), 0 24px 48px -16px rgb(14 23 38 / 0.18);
   color-scheme: light;
 }
 
-body {
-  background: #ffffff;
-  color: #0e1726;
+/* ------------------------------------------------------------------ base */
+@layer base {
+  html {
+    scroll-padding-top: calc(var(--nav-h) + 32px);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-teal) transparent;
+    background: var(--color-paper);
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-variant-numeric: lining-nums;
+  }
+  @media (max-width: 400px) {
+    body {
+      font-size: 1rem;
+    }
+  }
+  ::selection {
+    background: var(--color-teal-light);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  [data-nav="dark"] {
+    --focus: var(--color-teal-light);
+    color-scheme: dark;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  img,
+  svg,
+  video {
+    display: block;
+  }
+  button {
+    cursor: pointer;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-teal);
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+  }
+}
+
+/* ------------------------------------------------------------------ type
+   One variable family. Width is the voice: 125 for display, 100 for text. */
+@utility type-h1 {
+  font-size: clamp(2.375rem, 1.5rem + 3.9vw, 5.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  font-weight: 720;
+  font-variation-settings: "wdth" 125;
+}
+@utility type-h2 {
+  font-size: clamp(1.875rem, 1.3rem + 2.4vw, 3.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  font-weight: 680;
+  font-variation-settings: "wdth" 125;
+}
+@utility type-h3 {
+  font-size: clamp(1.375rem, 1.15rem + 1vw, 2rem);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  font-weight: 640;
+  font-variation-settings: "wdth" 118;
+}
+@utility type-statement {
+  font-size: clamp(1.5rem, 1.05rem + 2.1vw, 2.875rem);
+  line-height: 1.22;
+  letter-spacing: -0.015em;
+  font-weight: 560;
+  font-variation-settings: "wdth" 112;
+}
+@utility type-lead {
+  font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
+  line-height: 1.5;
+  font-weight: 400;
+  font-variation-settings: "wdth" 100;
+}
+@utility type-ui {
+  font-size: 0.9375rem;
+  line-height: 1.2;
+  font-weight: 560;
+  font-variation-settings: "wdth" 100;
+}
+@utility type-small {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  font-weight: 450;
+}
+@utility type-micro {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+@utility type-figure {
+  font-weight: 660;
+  font-variation-settings: "wdth" 125;
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.02em;
+}
+@utility num {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ------------------------------------------------------------------ layout */
+@utility container-x {
+  width: 100%;
+  max-width: calc(1280px + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+@utility section-y {
+  padding-block: var(--section-y);
+}
+@utility measure {
+  max-width: 68ch;
+}
+
+/* ------------------------------------------------------------------ skip link */
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 90;
+  padding: 12px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-weight: 600;
+  transform: translateY(-160%);
+  transition: transform var(--dur-ui) var(--ease-ui);
+}
+.skip-link:focus-visible {
+  transform: none;
+  outline-color: var(--color-teal-light);
+}
+
+/* ------------------------------------------------------------------ hero H1 entrance
+   CSS only, starts at first paint, never waits for JS (FP-D28). */
+@keyframes word-rise {
+  from {
+    transform: translate3d(0, 108%, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+.rise-word {
+  display: inline-block;
+  overflow: clip;
+  overflow-clip-margin: 0.12em;
+  vertical-align: top;
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+}
+.rise-word > span {
+  display: inline-block;
+  animation: word-rise 700ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 45ms + 60ms);
+}
+.rise-fade {
+  animation: fade-up 600ms var(--ease-out) both;
+  animation-delay: var(--d, 260ms);
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise-word > span,
+  .rise-fade {
+    animation: none;
+  }
 }

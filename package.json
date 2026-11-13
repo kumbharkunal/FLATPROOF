@@ -10,9 +10,9 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm run build",
-    "images": "node scripts/images.mjs",
-    "icons": "node scripts/icons.mjs",
-    "logo": "node scripts/logo.mjs",
+    "images": "node --no-warnings scripts/images.mjs",
+    "icons": "node --no-warnings scripts/icons.mjs",
+    "logo": "node --no-warnings scripts/logo.mjs",
     "shots": "node scripts/shots.mjs",
     "size": "node scripts/bundle-size.mjs",
     "test:e2e": "playwright test"
