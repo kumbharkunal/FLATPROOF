@@ -74,7 +74,7 @@ Headings use `text-wrap: balance`, paragraphs `pretty`. Body measure is 68ch at 
 - **Radii by role:** pill 999px (nav, buttons, tags), lens 50%, panel 24px (report sheet, menu sheet), media 16px, input 12px, chip 8px.
 - **Shadows, navy-tinted, only on floating things:** `--shadow-float` (nav pill, floating WhatsApp) and `--shadow-sheet` (report sheet, mini report).
 - **Glass** only on the nav pill and the phone menu sheet: blur plus saturate, a 1px inner highlight, an opaque fallback without `backdrop-filter`. The blur never animates (FP-D9).
-- **Layers:** content 0, floating WhatsApp 40, nav 50, cursor 60, menu 70 to 80, skip link 90.
+- **Layers:** content 0, floating WhatsApp 40, nav 50, menu 70 to 80, skip link 90.
 
 ## 6. Motion
 
@@ -86,7 +86,7 @@ Headings use `text-wrap: balance`, paragraphs `pretty`. Body measure is 68ch at 
 | reveal | 700ms, the same expo out | Hero entrance |
 | draw | 900ms, `cubic-bezier(.65,0,.35,1)` | Revision clouds, dimension lines |
 | lock | 380ms, one overshoot (`back.out`) | The lens locking on a finding |
-| follow | `quickTo` 0.35s power3.out | Lens and cursor ring |
+| follow | `quickTo` 0.35s power3.out | The lens following the pointer |
 
 **Rules.**
 - Animate only transform, opacity, clip-path and SVG stroke. `will-change` only while a tween runs. Never set a CSS variable on a parent to move children.
@@ -109,7 +109,7 @@ Headings use `text-wrap: balance`, paragraphs `pretty`. Body measure is 68ch at 
 - **FAQ:** CSS disclosures (grid rows 0fr to 1fr, `inert` when closed).
 - **Floating WhatsApp:** 56px, appears after the hero, hides from the booking section to the end of the page (FP-D67).
 - **Footer wordmark:** FLATPROOF edge to edge of the content column, a dim navy silhouette lit by a sweeping teal scan line (FLAT silver, PROOF teal), with a reflection below (FP-D66).
-- **Cursor:** fine pointers only; a dot and a lagging ring; links grow the ring; CTAs show a short label beside the pointer, never over the button text (FP-D50); hidden over the hero stage, where the lens takes over.
+- **Cursor:** the normal arrow and hand, drawn in teal with a white edge and a soft shadow, so they read on paper, navy, ink, a teal button and the thermal image alike. CSS only (no script), mouse and trackpad only; text fields keep the system caret; high-contrast mode keeps the system cursors. A 2x drawing keeps them sharp on high-density screens (FP-D68).
 
 ## 8. Imagery
 

@@ -49,7 +49,6 @@ export function FloatingWhatsApp({ href, label }: { href: string; label: string 
       tabIndex={visible ? undefined : -1}
       target="_blank"
       rel="noopener noreferrer"
-      data-cursor="WhatsApp"
     >
       <WhatsappIcon className="size-7" idPrefix="wa-float" />
       <span className="float-wa-label" aria-hidden="true">

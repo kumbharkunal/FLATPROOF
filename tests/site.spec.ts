@@ -203,6 +203,50 @@ test("footer wordmark: decorative, and fully lit by the time the page ends", asy
   expect(["none", "inset(0px 0% 0px 0px)", "inset(0px)"]).toContain(clip);
 });
 
+test("cursor: the normal arrow and hand in brand teal, the system caret in text fields", async ({ page }, info) => {
+  await page.goto("/");
+  const r = await page.evaluate(() => {
+    const c = (sel: string) => getComputedStyle(document.querySelector(sel)!).cursor;
+    return {
+      page: getComputedStyle(document.documentElement).cursor,
+      text: c(".hero-lead"),
+      stage: c(".hero-stage"),
+      link: c("a[href]"),
+      button: c("button"),
+      field: c("#carpet-area input"),
+      follower: document.querySelectorAll(".cursor").length,
+    };
+  });
+  expect(r.follower).toBe(0);
+  if (info.project.name === "phone") {
+    // Touch screens have no pointer to draw.
+    expect(r.page).toBe("auto");
+    return;
+  }
+  expect(r.page).toMatch(/^(-webkit-)?image-set\(.*svg.*\) 4 3, auto$/);
+  expect(r.text).toBe(r.page);
+  expect(r.stage).toBe(r.page);
+  expect(r.link).toMatch(/^(-webkit-)?image-set\(.*svg.*\) 12 3, pointer$/);
+  expect(r.button).toBe(r.link);
+  expect(r.field).toBe("text");
+  // Every drawing decodes at its stated size (32 for 1x, 64 for 2x).
+  const sizes = await page.evaluate(async (values) => {
+    const urls = values.flatMap((v) => [...v.matchAll(/url\("([^"]+)"\)/g)].map((m) => m[1]));
+    return Promise.all(
+      urls.map(
+        (u) =>
+          new Promise<number>((done) => {
+            const img = new Image();
+            img.onload = () => done(img.naturalWidth);
+            img.onerror = () => done(0);
+            img.src = u;
+          }),
+      ),
+    );
+  }, [r.page, r.link]);
+  expect(sizes).toEqual([32, 64, 32, 64]);
+});
+
 test("floating WhatsApp: hidden on the hero and from the close to the end, shown in between", async ({ page }) => {
   await page.goto("/");
   await settle(page);

@@ -91,7 +91,7 @@ export function ThermalLens({ findings, grids, copy, intro, base, full, lens }: 
         onThermal={toggleThermal}
         onPause={() => setPaused((v) => !v)}
       />
-      <div className="hero-stage" data-cursor-hide>
+      <div className="hero-stage">
         <div className="cover stage-base">{base}</div>
         <div className="stage-thermal" aria-hidden="true">
           <div className="cover">{full}</div>

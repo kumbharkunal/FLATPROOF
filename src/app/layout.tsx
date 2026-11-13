@@ -4,7 +4,6 @@ import localFont from "next/font/local";
 import { site, waHref } from "@/content/site";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { Nav } from "@/components/nav/Nav";
-import { Cursor } from "@/components/cursor/Cursor";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { Footer } from "@/components/sections/Footer";
 import "./globals.css";
@@ -67,7 +66,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         <Footer />
         <FloatingWhatsApp href={waHref("book")} label={site.floatingWa.label} />
-        <Cursor />
       </body>
     </html>
   );

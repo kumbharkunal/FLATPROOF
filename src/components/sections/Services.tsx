@@ -25,7 +25,7 @@ export function Services() {
                   {"byline" in it && it.byline ? <p className="svc-by">{it.byline}</p> : null}
                   <p className="svc-sum">{it.summary}</p>
                 </div>
-                <WhatsAppButton wa={it.wa} variant="secondary" className="svc-cta" cursor="Ask">
+                <WhatsAppButton wa={it.wa} variant="secondary" className="svc-cta">
                   {s.action}
                   <span className="sr-only">: {it.name}</span>
                 </WhatsAppButton>

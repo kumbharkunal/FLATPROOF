@@ -158,7 +158,7 @@ export function NavClient({ data }: { data: NavData }) {
         }}
       >
         <div className="nav-pill">
-          <a href="#top" className="nav-brand" aria-label={data.home} data-cursor="Top">
+          <a href="#top" className="nav-brand" aria-label={data.home}>
             <Logo height={38} both eager />
           </a>
           <nav aria-label="Main" className="nav-links" ref={linksRef}>
@@ -178,7 +178,6 @@ export function NavClient({ data }: { data: NavData }) {
               className="btn btn-primary"
               target="_blank"
               rel="noopener noreferrer"
-              data-cursor="WhatsApp"
             >
               <WaChip />
               <span>{data.cta}</span>

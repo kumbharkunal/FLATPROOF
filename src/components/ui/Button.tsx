@@ -9,18 +9,15 @@ type Props = {
   children: ReactNode;
   variant?: Variant;
   className?: string;
-  /** Short label the custom cursor shows over this control. */
-  cursor?: string;
   external?: boolean;
   icon?: ReactNode;
 };
 
-export function Button({ href, children, variant = "primary", className = "", cursor, external, icon }: Props) {
+export function Button({ href, children, variant = "primary", className = "", external, icon }: Props) {
   return (
     <a
       href={href}
       className={`btn btn-${variant} ${className}`}
-      data-cursor={cursor}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
     >
       {icon}
@@ -35,16 +32,14 @@ export function WhatsAppButton({
   children,
   variant = "primary",
   className = "",
-  cursor = "WhatsApp",
 }: {
   wa: WaKey;
   children: ReactNode;
   variant?: Variant;
   className?: string;
-  cursor?: string;
 }) {
   return (
-    <Button href={waHref(wa)} variant={variant} className={className} cursor={cursor} external icon={<WaChip />}>
+    <Button href={waHref(wa)} variant={variant} className={className} external icon={<WaChip />}>
       {children}
     </Button>
   );
