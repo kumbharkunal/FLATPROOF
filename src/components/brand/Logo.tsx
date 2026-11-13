@@ -1,8 +1,15 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element -- pre-sized static brand files with srcset; going through the
+   image optimiser made the logo wait one to two seconds after every deploy (FP-D57). */
 
-// The client's logo, cut from their own artwork by scripts/logo.mjs (never redrawn).
+// The client's logo, cut from their own artwork by scripts/logo.mjs (never redrawn), served as
+// static WebP files: 192px wide for 1x and 2x screens, 320px for 3x.
 // With `both`, the light and reversed files both render and CSS shows the one that suits the
 // ground (`.logo-on-light` / `.logo-on-dark`), so a theme change never waits on the network.
+const files = (name: "logo" | "logo-reversed") => ({
+  src: `/brand/${name}-192.webp`,
+  srcSet: `/brand/${name}-192.webp 192w, /brand/${name}-320.webp 320w`,
+});
+
 export function Logo({
   height = 38,
   both = false,
@@ -19,22 +26,16 @@ export function Logo({
     width,
     height,
     sizes: `${width}px`,
-    quality: 85,
     loading: eager ? ("eager" as const) : ("lazy" as const),
+    decoding: "async" as const,
   };
   if (both) {
     return (
       <span className="logo-swap" style={{ width, height }}>
-        <Image src="/brand/logo.png" className="logo-on-light" alt="FlatProof Inspection Services" {...common} />
-        <Image src="/brand/logo-reversed.png" className="logo-on-dark" alt="" aria-hidden="true" {...common} />
+        <img {...files("logo")} className="logo-on-light" alt="FlatProof Inspection Services" {...common} />
+        <img {...files("logo-reversed")} className="logo-on-dark" alt="" aria-hidden="true" {...common} />
       </span>
     );
   }
-  return (
-    <Image
-      src={dark ? "/brand/logo-reversed.png" : "/brand/logo.png"}
-      alt="FlatProof Inspection Services"
-      {...common}
-    />
-  );
+  return <img {...files(dark ? "logo-reversed" : "logo")} alt="FlatProof Inspection Services" {...common} />;
 }

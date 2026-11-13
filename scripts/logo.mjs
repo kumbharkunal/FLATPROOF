@@ -5,6 +5,10 @@
 //   logo-reversed.png   same, navy parts turned white for dark grounds (needs client sign-off, FP-D2)
 //   mark.png            the mark only (clipboard, roof, tick, magnifier), square, transparent
 //   mark-reversed.png   the mark for dark grounds
+//   logo-192.webp, logo-320.webp, logo-reversed-192.webp, logo-reversed-320.webp
+//                       the lockups for the page itself (320px is sharp at 3x for every placement up to
+//                       46px tall; 192px covers 1x and 2x), served as static files with srcset, so the
+//                       logo never waits on the image optimiser after a deploy (FP-D57)
 import { mkdir } from 'node:fs/promises';
 import sharp from 'sharp';
 
@@ -70,7 +74,16 @@ await cut(LOCKUP, { reversed: true }).png(png).toFile('public/brand/logo-reverse
 await (await squareOf(cut(MARK))).png(png).toFile('public/brand/mark.png');
 await (await squareOf(cut(MARK, { reversed: true }))).png(png).toFile('public/brand/mark-reversed.png');
 
-for (const f of ['logo', 'logo-reversed', 'mark', 'mark-reversed']) {
-  const m = await sharp(`public/brand/${f}.png`).metadata();
-  console.log(`public/brand/${f}.png  ${m.width}x${m.height}`);
+for (const f of ['logo', 'logo-reversed']) {
+  for (const w of [192, 320]) {
+    await sharp(`public/brand/${f}.png`)
+      .resize({ width: w })
+      .webp({ quality: 80, alphaQuality: 80, smartSubsample: true, effort: 6 })
+      .toFile(`public/brand/${f}-${w}.webp`);
+  }
+}
+
+for (const f of ['logo.png', 'logo-reversed.png', 'mark.png', 'mark-reversed.png', 'logo-192.webp', 'logo-320.webp', 'logo-reversed-192.webp', 'logo-reversed-320.webp']) {
+  const m = await sharp(`public/brand/${f}`).metadata();
+  console.log(`public/brand/${f}  ${m.width}x${m.height}`);
 }
