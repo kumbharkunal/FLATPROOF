@@ -90,7 +90,8 @@ export function useLensEngine(
           let t = 0.5;
           for (const f of findings) {
             const p = layout === "desktop" ? f.d : f.m;
-            const d = ((px - p.x) / f.thermal.rx) ** 2 + ((py - p.y) / f.thermal.ry) ** 2;
+            const s = f.thermal[layout];
+            const d = ((px - p.x) / s.rx) ** 2 + ((py - p.y) / s.ry) ** 2;
             t += (f.thermal.kind === "cold" ? -1 : 1) * 0.42 * f.thermal.strength * Math.exp(-d / 2);
           }
           return Math.min(1, Math.max(0, t));

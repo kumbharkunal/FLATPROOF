@@ -11,10 +11,10 @@ export default defineConfig({
   workers: 2,
   reporter: [["list"]],
   outputDir: `${qa}/test-results`,
-  use: { baseURL: process.env.BASE_URL ?? "http://localhost:4400" },
+  use: { baseURL: process.env.BASE_URL ?? "http://localhost:4410" },
   webServer: process.env.BASE_URL
     ? undefined
-    : { command: "npm run start:qa", url: "http://localhost:4400", reuseExistingServer: true, timeout: 90_000 },
+    : { command: "npm run start:qa", url: "http://localhost:4410", reuseExistingServer: true, timeout: 90_000 },
   projects: [
     { name: "desktop", use: { viewport: { width: 1440, height: 900 } } },
     { name: "phone", use: { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 } },

@@ -43,7 +43,7 @@ Every conflict is logged in `docs/DECISIONS.md` as FP-D#.
 ```bash
 npm run dev                              # local dev
 npm run lint && npm run typecheck        # ESLint + tsc --noEmit
-npm run build && npx next start -p 4400  # production check (QA runs against :4400)
+npm run build && npx next start -p 4410  # production check (QA runs against :4410; :4400 is the PDI PRO INDIA project)
 npm run images                           # images-inbox -> public/images, thermal twins, manifest (--debug for marker overlays)
 npm run icons                            # favicon and app icons from the logo mark
 npm run test:e2e                         # Playwright: layout, nav, menu, lens, a11y (axe), links, reduced motion

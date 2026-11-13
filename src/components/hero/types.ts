@@ -6,10 +6,14 @@ export type LensFinding = {
   body: string;
   method: string;
   link: { label: string; href: string };
-  thermal: { kind: "cold" | "warm"; strength: number; rx: number; ry: number };
+  /** Anomaly spread per image (Gaussian sigma, % of width and height). */
+  thermal: { kind: "cold" | "warm"; strength: number; desktop: { rx: number; ry: number }; mobile: { rx: number; ry: number } };
   /** Hotspot for the desktop layout and the phone layout, in % of the image. */
   d: LensPoint;
   m: LensPoint;
+  /** Revision-cloud radii for each layout, both in % of the image width. */
+  cd: readonly [number, number];
+  cm: readonly [number, number];
 };
 
 export type LensGrid = { cols: number; rows: number; data: string };

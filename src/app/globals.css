@@ -792,14 +792,18 @@ html.cursor-on .cursor {
 .hero-lens > .hero-panel {
   order: 2;
 }
-/* Cover box: the image's own ratio, scaled to cover the stage, centred (CSS only, SSR-safe). */
+/* Cover box: the image's own ratio, scaled to cover the stage (CSS only, SSR-safe). Centred, unless
+   --keep-x / --keep-y (set by Hero from the findings) ask for the right or bottom share of the image
+   to stay in frame: then the crop slides just that far, and never past the image's edges. The
+   overlay, both thermal layers and the lens use this same box, so they stay registered. */
 .cover {
+  --cw: max(100cqw, calc(100cqh * var(--r)));
+  --ch: max(100cqh, calc(100cqw / var(--r)));
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: max(100cqw, calc(100cqh * var(--r)));
-  height: max(100cqh, calc(100cqw / var(--r)));
-  transform: translate(-50%, -50%);
+  width: var(--cw);
+  height: var(--ch);
+  left: clamp(calc(100cqw - var(--cw)), min(calc((100cqw - var(--cw)) / 2), calc(100cqw - var(--cw) * var(--keep-x, 0.5))), 0px);
+  top: clamp(calc(100cqh - var(--ch)), min(calc((100cqh - var(--ch)) / 2), calc(100cqh - var(--ch) * var(--keep-y, 0.5))), 0px);
 }
 .cover > img,
 .cover > svg,
@@ -1187,8 +1191,8 @@ html.cursor-on .cursor {
 }
 
 /* Wide hero: the honesty caption sits in the stage corner, like a photo credit.
-   The wide-hero query (1024px and up, at least 5:4) matches HERO_WIDE in components/hero/layout.ts. */
-@media (min-width: 1024px) and (min-aspect-ratio: 5/4) {
+   The wide-hero query (1024px and up, at least 3:2) matches HERO_WIDE in components/hero/layout.ts. */
+@media (min-width: 1024px) and (min-aspect-ratio: 3/2) {
   .hero-caption {
     display: block;
     position: absolute;
@@ -1210,7 +1214,7 @@ html.cursor-on .cursor {
 }
 
 /* Stacked hero (below 1024px, or a portrait screen): copy, a 4:5 stage, then the panel (DOM order). */
-@media not all and (min-width: 1024px) and (min-aspect-ratio: 5/4) {
+@media not all and (min-width: 1024px) and (min-aspect-ratio: 3/2) {
   .hero-ctas .hero-secondary {
     min-height: 48px;
     padding: 0 4px;
@@ -1239,8 +1243,49 @@ html.cursor-on .cursor {
   }
 }
 
+/* Landscape tablets (1024px and up, between 5:4 and 3:2): two columns. Copy and panel on the left,
+   the 4:5 photo framed on the right, so no text sits over the room. A 16:9 crop of this shape could
+   not hold a text column and the switchboard at 95% across. */
+@media (min-width: 1024px) and (min-aspect-ratio: 5/4) and (max-aspect-ratio: 1499/1000) {
+  .hero {
+    --lens: clamp(150px, 14vw, 190px);
+    min-height: max(100svh, 640px);
+  }
+  .hero-lens {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(32px, 4vw, 64px);
+    align-items: start;
+    width: 100%;
+    max-width: calc(1280px + var(--gutter) * 2);
+    margin-inline: auto;
+    padding: calc(max(12px, env(safe-area-inset-top)) + 64px + 28px) var(--gutter) 32px;
+  }
+  .hero-copy {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 0;
+  }
+  .hero-lens > .hero-panel {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    max-width: 460px;
+    margin: 24px 0 0;
+  }
+  .hero-stage {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    justify-self: end;
+    width: min(100%, calc((100svh - 140px) * 0.8));
+    border-radius: 20px;
+  }
+}
+
 /* Wide hero: full-bleed stage; copy and panel stacked in the calm left column. */
-@media (min-width: 1024px) and (min-aspect-ratio: 5/4) {
+@media (min-width: 1024px) and (min-aspect-ratio: 3/2) {
   .hero {
     --r: 1.7778; /* 16:9 */
     --lens: clamp(190px, 16vw, 264px);
@@ -1299,8 +1344,15 @@ html.cursor-on .cursor {
   .hero-lead {
     max-width: 40ch;
   }
+  /* Over the photo the lead always ends before the window (45% across the uncropped image): never
+     wider than 31% of the screen, nor past the window's edge less 24px. */
+  .hero[data-photo="true"] .hero-lead {
+    max-width: min(40ch, 31vw, calc(45vw - (100vw - 1280px) / 2 - 24px));
+  }
+  /* Wide enough that the completed header ("Found 4 of 4", "See all 125+ checks", the switch) stays on
+     one row: a wrap would make the hero taller and re-zoom the photo at the moment of completion. */
   .hero-panel {
-    width: min(400px, 36vw);
+    width: min(448px, 36vw);
     margin: clamp(18px, 3.2vh, 34px) 0 0;
     padding: 14px 16px 14px;
     background: rgb(14 23 38 / 0.94);
@@ -1325,7 +1377,14 @@ html.cursor-on .cursor {
     opacity: 1;
   }
 }
-@media (min-width: 1024px) and (min-aspect-ratio: 5/4) and (max-height: 820px) {
+/* Narrower than 16:9, the photo's crop slides right to keep the switchboard in frame, which brings the
+   window closer to the text: the copy column then hugs the left gutter instead of the page grid. */
+@media (min-width: 1024px) and (min-aspect-ratio: 3/2) and (max-aspect-ratio: 1749/1000) {
+  .hero[data-photo="true"] .hero-lens {
+    padding-left: var(--gutter);
+  }
+}
+@media (min-width: 1024px) and (min-aspect-ratio: 3/2) and (max-height: 820px) {
   .panel-text {
     display: none;
   }

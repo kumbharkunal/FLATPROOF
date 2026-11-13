@@ -1,4 +1,4 @@
-// QA screenshots and layout checks with Playwright (run against a production build on :4400).
+// QA screenshots and layout checks with Playwright (run against a production build on :4410).
 // Usage: node scripts/shots.mjs [url] [--w=390] [--h=844] [--touch] [--reduce] [--tag=name]
 // Writes PNGs to %LOCALAPPDATA%\flatproof-qa\shots\<tag>\ (outside OneDrive) and prints horizontal
 // overflow, tap targets under 44px, and console errors.
@@ -15,7 +15,7 @@ const args = Object.fromEntries(
       return [k, v ?? true];
     }),
 );
-const url = process.argv.slice(2).find((a) => !a.startsWith("--")) ?? "http://localhost:4400/";
+const url = process.argv.slice(2).find((a) => !a.startsWith("--")) ?? "http://localhost:4410/";
 const W = Number(args.w ?? 390);
 const H = Number(args.h ?? 844);
 const touch = !!args.touch;

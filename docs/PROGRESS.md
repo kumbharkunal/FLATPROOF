@@ -21,9 +21,10 @@ Resume point for any new session or after compaction: read `docs/BRIEF.md`, then
 - 2026-11-13: Phase A plan approved (daylight hero, reversed logo on dark, references studied). Phase B: M0 to M9 done and pushed; production deployed by CLI.
 - 2026-11-13: QA pass 2 done. Hero recomposed for 5:4 screens and portrait iPads, keyboard order fixed (switch then findings), side stripes and cursor overlap removed, nav kept through jumps, report complete on landing, units glued. The taste consistency checker ran past 10 minutes without printing its table; its saved crops were reviewed one by one instead.
 - 2026-11-13: M11 done. Handover docs written; production deployed four times by CLI (docs, then the three launch fixes). `vercel git connect` retried after the last deploy: still refused (no GitHub App access to the private repo).
+- 2026-11-14: Photos added (all seven, at ChatGPT's sizes: 1122 to 1672px). Hotspots, clouds and thermal patches calibrated on both hero photos; desktop crop keeps every finding in frame; landscape tablets get a two-column hero; photos no longer upscaled; crop focus per slot; hero photo eager. FP-D60 to FP-D65. QA moved to port 4410 (4400 is PDI PRO INDIA).
 
 ## Open items for the user
 - Give the Vercel GitHub App access to `kumbharkunal/FLATPROOF` (GitHub, Settings, Applications, Vercel, Configure, Repository access), then run `vercel git connect` or link it under the project's Git settings. Until then, deploy with `vercel deploy --prod`.
-- Generate the seven images from IMAGE_PROMPTS.md into `images-inbox/`, then say "images added" (hotspot calibration with `npm run images -- --debug` follows).
+- Optional: regenerate the two hero photos at a larger size if a tool can (the desktop one is 1672px wide and looks soft on 2560px screens).
 - Client questions: `CLIENT_QUESTIONS.md` (30 questions).
 - Optional: a jury-style scored review of the live URL (needs a separate critic agent).

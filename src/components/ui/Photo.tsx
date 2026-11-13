@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { images } from "@/content/images.generated";
-import { site, type ImageKey } from "@/content/site";
+import { site, type ImageKey, type ImageSlot } from "@/content/site";
 
 type Props = {
   slot: ImageKey;
@@ -15,7 +15,7 @@ type Props = {
 // a soft gradient, light grain and viewfinder linework, so the layout never looks broken.
 export function Photo({ slot, sizes, className = "", tone = "mist" }: Props) {
   const img = images[slot];
-  const meta = site.images[slot];
+  const meta: ImageSlot = site.images[slot];
   if (img) {
     return (
       <div className={`photo ${className}`}>
@@ -27,7 +27,7 @@ export function Photo({ slot, sizes, className = "", tone = "mist" }: Props) {
           quality={75}
           placeholder="blur"
           blurDataURL={img.blur}
-          style={{ objectFit: "cover" }}
+          style={{ objectFit: "cover", objectPosition: meta.focus }}
         />
       </div>
     );

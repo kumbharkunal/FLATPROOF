@@ -10,7 +10,12 @@
 
 export type Claim = { value: string; needsConfirm: boolean; source: string };
 export type Point = { x: number; y: number }; // percentages of the image box
-export type Thermal = { kind: "cold" | "warm"; strength: number; rx: number; ry: number }; // radii in % of width/height
+/** Spread of a thermal anomaly (Gaussian sigma) in % of the image's width and height. */
+export type Spread = { rx: number; ry: number };
+/** The anomaly `npm run images` paints into each hero photo's thermal twin, at that photo's hotspot. */
+export type Thermal = { kind: "cold" | "warm"; strength: number; desktop: Spread; mobile: Spread };
+/** Revision-cloud radii, both in % of the image width. */
+export type Cloud = readonly [rx: number, ry: number];
 
 export type Finding = {
   id: "damp" | "socket" | "tile" | "sill";
@@ -19,8 +24,10 @@ export type Finding = {
   method: string;
   link: { label: string; href: string };
   thermal: Thermal;
-  /** Hotspot per image. `linework` is the SVG placeholder room shown until the photos arrive. */
+  /** Hotspot per image. `linework` is the SVG placeholder room, used while a hero photo is missing. */
   at: { desktop: Point; mobile: Point; lineworkDesktop: Point; lineworkMobile: Point };
+  /** Cloud size per image, so it frames the object it marks (a sill is a third of the desktop photo). */
+  cloud: { desktop: Cloud; mobile: Cloud; lineworkDesktop: Cloud; lineworkMobile: Cloud };
 };
 
 export type ImageSlot = {
@@ -31,6 +38,8 @@ export type ImageSlot = {
   usedIn: string;
   thermal?: boolean;
   real?: boolean;
+  /** Where to anchor the crop when a box of another shape shows the photo (CSS object-position). */
+  focus?: string;
 };
 
 const WA_NUMBER = "919657555588";
@@ -139,13 +148,15 @@ export const site = {
         body: "Cold patch on the thermal image: water inside the wall. Our sample report measured 86% moisture.",
         method: "Thermal camera and moisture meter",
         link: { label: "See the sample report", href: "#report" },
-        thermal: { kind: "cold", strength: 0.85, rx: 7, ry: 9 },
+        // Photos: just above the back-wall skirting, under the window's right side.
+        thermal: { kind: "cold", strength: 0.85, desktop: { rx: 4.5, ry: 5 }, mobile: { rx: 5.5, ry: 4 } },
         at: {
-          desktop: { x: 72, y: 77 },
-          mobile: { x: 70, y: 77 },
+          desktop: { x: 70, y: 74.5 },
+          mobile: { x: 57, y: 69.3 },
           lineworkDesktop: { x: 69.4, y: 71 },
           lineworkMobile: { x: 68.5, y: 74.4 },
         },
+        cloud: { desktop: [6.2, 3.4], mobile: [10, 5], lineworkDesktop: [7.5, 3.8], lineworkMobile: [14, 6.5] },
       },
       {
         id: "socket",
@@ -153,13 +164,15 @@ export const site = {
         body: "Neutral and earth reversed, earthing inactive. Appliances can get damaged.",
         method: "Polarity test",
         link: { label: "See the electrical checks", href: "#checks" },
-        thermal: { kind: "warm", strength: 0.9, rx: 2.4, ry: 3.6 },
+        // Photos: the centre of the switchboard plate on the right wall.
+        thermal: { kind: "warm", strength: 0.9, desktop: { rx: 1.4, ry: 2.2 }, mobile: { rx: 1.8, ry: 1.4 } },
         at: {
-          desktop: { x: 86, y: 55 },
-          mobile: { x: 85, y: 55 },
+          desktop: { x: 95.2, y: 52.5 },
+          mobile: { x: 91.4, y: 51.3 },
           lineworkDesktop: { x: 76.4, y: 55 },
           lineworkMobile: { x: 87, y: 55.3 },
         },
+        cloud: { desktop: [4.4, 3.1], mobile: [6.6, 4.2], lineworkDesktop: [3.7, 2.4], lineworkMobile: [6, 5] },
       },
       {
         id: "tile",
@@ -167,13 +180,15 @@ export const site = {
         body: "A tap sounds hollow where the mortar bed has gaps. Hollow tiles can crack and come loose.",
         method: "Acoustic tap test",
         link: { label: "See the masonry checks", href: "#checks" },
-        thermal: { kind: "cold", strength: 0.35, rx: 8, ry: 4 },
+        // Photos: one whole tile in the foreground, between grout lines.
+        thermal: { kind: "cold", strength: 0.35, desktop: { rx: 6, ry: 3 }, mobile: { rx: 9, ry: 2.6 } },
         at: {
-          desktop: { x: 80, y: 90 },
-          mobile: { x: 48, y: 90 },
+          desktop: { x: 78, y: 90.5 },
+          mobile: { x: 46, y: 93 },
           lineworkDesktop: { x: 77.3, y: 85.9 },
           lineworkMobile: { x: 50, y: 90.5 },
         },
+        cloud: { desktop: [7.5, 3], mobile: [13, 4.4], lineworkDesktop: [5.2, 2.5], lineworkMobile: [15, 4.6] },
       },
       {
         id: "sill",
@@ -181,13 +196,15 @@ export const site = {
         body: "Loose white cement under the granite and no seal at the frame. Rain can get in at that joint.",
         method: "Tap test and visual check",
         link: { label: "See the case file", href: "#case" },
-        thermal: { kind: "cold", strength: 0.6, rx: 11, ry: 2.2 },
+        // Photos: the middle of the granite sill, along its full length.
+        thermal: { kind: "cold", strength: 0.6, desktop: { rx: 9.5, ry: 1.3 }, mobile: { rx: 14, ry: 0.9 } },
         at: {
-          desktop: { x: 62, y: 45.5 },
-          mobile: { x: 50, y: 30.5 },
+          desktop: { x: 62.6, y: 56 },
+          mobile: { x: 32.3, y: 49.8 },
           lineworkDesktop: { x: 61, y: 44.6 },
           lineworkMobile: { x: 50, y: 30.2 },
         },
+        cloud: { desktop: [19.8, 2.2], mobile: [29.5, 3], lineworkDesktop: [12.6, 2], lineworkMobile: [28, 3.6] },
       },
     ] satisfies Finding[],
   },
@@ -522,6 +539,7 @@ export const site = {
       height: 1600,
       alt: "An engineer kneels and points a thermal camera at the skirting of a freshly painted wall.",
       usedIn: "How it works, step 2; water-leak service",
+      focus: "58% 50%", // keeps the camera and the engineer's face in the 4:5 services frame
     },
     "tap-test": {
       file: "tap-test",
@@ -529,13 +547,15 @@ export const site = {
       height: 2000,
       alt: "An engineer taps a glossy floor tile with a small steel tapping tool to listen for hollow spots.",
       usedIn: "How it works, step 1; pre-possession service",
+      focus: "50% 78%", // keeps the tapping tool in the 4:3 step frame
     },
     "laser-measure": {
       file: "laser-measure",
       width: 2400,
       height: 1600,
       alt: "A laser distance meter on the floor of an empty room sends a red beam to the opposite wall.",
-      usedIn: "Carpet-area section; carpet-area service",
+      usedIn: "Carpet-area service",
+      focus: "16% 50%", // keeps the meter, at the far left of the photo, in the 4:5 services frame
     },
     "handover-couple": {
       file: "handover-couple",

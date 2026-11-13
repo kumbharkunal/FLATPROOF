@@ -58,7 +58,7 @@ Tailwind's default palette is removed (`--color-*: initial`), so only these colo
 | `type-micro` | 13px | 1.35 | 0.01em | 600 | 100 |
 | `type-figure` | per use | | -0.02em | 660 | 125 |
 
-Headings use `text-wrap: balance`, paragraphs `pretty`. Body measure is 68ch at most. A figure and its unit never break apart (` `, FP-D53).
+Headings use `text-wrap: balance`, paragraphs `pretty`. Body measure is 68ch at most. A figure and its unit never break apart (`\u00a0`, FP-D53).
 
 ## 4. Space and layout
 
@@ -67,7 +67,7 @@ Headings use `text-wrap: balance`, paragraphs `pretty`. Body measure is 68ch at 
 - Section padding: `clamp(88px, 11vw, 168px)` top and bottom. Sections separate by ground change, not by rules.
 - Lines appear only where they measure: dimension lines, tape ticks, the floor plan, index rows (FP-D6).
 - `scroll-padding-top` is the nav height plus 32px, so anchors and keyboard focus land under the pill.
-- Hero: the full-bleed 16:9 stage needs a screen 1024px or wider and at least 5:4 (`HERO_WIDE`); everything else stacks copy, a 4:5 stage (560px wide at most) and the readout panel (FP-D40, FP-D47).
+- Hero, three layouts by screen shape: full-bleed 16:9 photo at 1024px and up and at least 3:2 (`HERO_WIDE`), with the crop sliding to keep every finding in frame; two columns on landscape tablets (5:4 to 3:2), copy and panel left, the 4:5 photo framed right; stacked everywhere else, copy, a 4:5 stage (560px wide at most) and the panel (FP-D40, FP-D47, FP-D61, FP-D62).
 
 ## 5. Shape and depth
 

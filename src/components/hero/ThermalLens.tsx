@@ -7,14 +7,6 @@ import { LensPanel } from "./LensPanel";
 import { useLensEngine } from "./useLensEngine";
 import type { LensCopy, LensFinding, LensGrid } from "./types";
 
-// Cloud radii per finding, in % of the image width: [rx, ry] for desktop (d) and phone (m) crops.
-const CLOUD: Record<LensFinding["id"], { d: [number, number]; m: [number, number] }> = {
-  damp: { d: [7.5, 3.8], m: [14, 6.5] },
-  socket: { d: [3.7, 2.4], m: [6, 5] },
-  tile: { d: [5.2, 2.5], m: [15, 4.6] },
-  sill: { d: [12.6, 2], m: [28, 3.6] },
-};
-
 type Props = {
   findings: LensFinding[];
   grids: { desktop?: LensGrid; mobile?: LensGrid };
@@ -120,7 +112,8 @@ export function ThermalLens({ findings, grids, copy, intro, base, full, lens }: 
               >
                 {findings.map((f) => {
                   const p = f[k];
-                  const [rx, ry] = CLOUD[f.id][k];
+                  // Cloud radii come with the finding, per image (site.ts `cloud`), in % of the width.
+                  const [rx, ry] = k === "d" ? f.cd : f.cm;
                   return (
                     <path
                       key={f.id}

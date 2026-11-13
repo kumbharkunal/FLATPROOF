@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "start:qa": "next start -p 4400",
+    "start:qa": "next start -p 4410",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm run build",

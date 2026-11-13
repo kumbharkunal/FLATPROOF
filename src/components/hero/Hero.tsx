@@ -30,7 +30,19 @@ export function Hero() {
     thermal: f.thermal,
     d: photo ? f.at.desktop : f.at.lineworkDesktop,
     m: photo ? f.at.mobile : f.at.lineworkMobile,
+    cd: photo ? f.cloud.desktop : f.cloud.lineworkDesktop,
+    cm: photo ? f.cloud.mobile : f.cloud.lineworkMobile,
   }));
+
+  // When a screen narrower than 16:9 (or wider) crops the desktop photo, the crop slides just far
+  // enough to keep every finding and its whole cloud in frame (the switchboard sits at 95% across),
+  // instead of cutting from both sides. Read by `.cover` in globals.css.
+  const keep = photo
+    ? {
+        "--keep-x": Math.min(1, Math.max(...findings.map((f) => (f.d.x + f.cd[0]) / 100)) + 0.004).toFixed(3),
+        "--keep-y": Math.min(1, Math.max(...findings.map((f) => (f.d.y + f.cd[1] * (16 / 9)) / 100)) + 0.01).toFixed(3),
+      }
+    : undefined;
 
   let base: React.ReactNode;
   let full: React.ReactNode;
@@ -48,7 +60,8 @@ export function Hero() {
     base = (
       <picture>
         <source media={HERO_WIDE} srcSet={dp.srcSet} sizes="100vw" />
-        <img {...mp} alt={mp.alt} fetchPriority="high" decoding="async" />
+        {/* The LCP element: eager (getImageProps defaults to lazy), high priority, preloaded above. */}
+        <img {...mp} alt={mp.alt} loading="eager" fetchPriority="high" decoding="auto" />
       </picture>
     );
     const t = { quality: 70, alt: "" } as const;
@@ -110,7 +123,14 @@ export function Hero() {
   );
 
   return (
-    <section id="top" className="hero" data-nav="light" aria-labelledby="hero-title" data-photo={photo ? "true" : "false"}>
+    <section
+      id="top"
+      className="hero"
+      data-nav="light"
+      aria-labelledby="hero-title"
+      data-photo={photo ? "true" : "false"}
+      style={keep as React.CSSProperties | undefined}
+    >
       <ThermalLens findings={findings} grids={grids} copy={copy.lens} intro={intro} base={base} full={full} lens={lens} />
 
       <div className="sr-only">
