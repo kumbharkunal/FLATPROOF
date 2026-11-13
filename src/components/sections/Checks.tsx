@@ -5,6 +5,7 @@ import { ChecksMotion } from "./ChecksMotion";
 import { CheckAccordion } from "./CheckAccordion";
 
 const TONES = ["var(--color-teal-light)", "var(--color-teal)", "var(--color-steel)", "#e3eaf0"];
+const TICKS = Array.from({ length: 126 }, (_, i) => `M${i * 10} ${40 - (i % 25 === 0 ? 40 : i % 5 === 0 ? 22 : 11)}V40`).join("");
 
 // The 125-point check: a measuring tape that fills to 125, split by trade, with the named checks
 // and how each one is tested. Method over a points race (research A2).
@@ -46,10 +47,8 @@ export function Checks() {
         <div className="tape" aria-hidden="true">
           <div className="tape-ticks">
             <svg viewBox="0 0 1250 40" preserveAspectRatio="none">
-              {Array.from({ length: 126 }, (_, i) => {
-                const h = i % 25 === 0 ? 40 : i % 5 === 0 ? 22 : 11;
-                return <line key={i} x1={i * 10} x2={i * 10} y1={40 - h} y2={40} vectorEffect="non-scaling-stroke" />;
-              })}
+              {/* 126 ticks in one path (long every 25, medium every 5) */}
+              <path d={TICKS} fill="none" vectorEffect="non-scaling-stroke" />
             </svg>
             {[0, 25, 50, 75, 100, 125].map((n) => (
               <span key={n} className="tape-num" style={{ left: `${(n / 125) * 100}%` }}>

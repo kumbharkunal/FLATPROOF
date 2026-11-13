@@ -4,7 +4,7 @@ import { images } from "@/content/images.generated";
 import { site } from "@/content/site";
 import { Button, WhatsAppButton } from "@/components/ui/Button";
 import { HERO_STACKED, HERO_WIDE } from "./layout";
-import { RoomLinework } from "./RoomLinework";
+import { RoomLinework, RoomLineworkRef } from "./RoomLinework";
 import { ThermalLens } from "./ThermalLens";
 import type { LensFinding } from "./types";
 
@@ -72,14 +72,15 @@ export function Hero() {
     );
     full = (
       <>
-        <RoomLinework layout="desktop" variant="thermal" className="only-d" idPrefix="full-d" />
-        <RoomLinework layout="mobile" variant="thermal" className="only-m" idPrefix="full-m" />
+        <RoomLinework layout="desktop" variant="thermal" className="only-d" idPrefix="full-d" artId="thermal-art-d" />
+        <RoomLinework layout="mobile" variant="thermal" className="only-m" idPrefix="full-m" artId="thermal-art-m" />
       </>
     );
+    // The lens shows the same thermal drawing by reference (<use>), not a second copy.
     lens = (
       <>
-        <RoomLinework layout="desktop" variant="thermal" className="only-d" idPrefix="lens-d" />
-        <RoomLinework layout="mobile" variant="thermal" className="only-m" idPrefix="lens-m" />
+        <RoomLineworkRef layout="desktop" href="thermal-art-d" className="only-d" />
+        <RoomLineworkRef layout="mobile" href="thermal-art-m" className="only-m" />
       </>
     );
   }

@@ -7,7 +7,6 @@ import { ironbow } from "@/lib/ironbow";
 
 type V2 = readonly [number, number];
 const lerp = (a: V2, b: V2, t: number): V2 => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
-const pts = (...p: V2[]) => p.map((q) => `${q[0].toFixed(1)},${q[1].toFixed(1)}`).join(" ");
 
 type Geo = {
   W: number;
@@ -109,15 +108,28 @@ const PAPER = {
   sill: "#1c2533",
 };
 
+// Path helpers: one <path> per stroke style keeps the drawing to a few dozen nodes (DOM size and
+// the hydration payload both scale with node count). Coordinates are rounded to 0.1 units.
+const n1 = (v: number) => String(Math.round(v * 10) / 10);
+const at = (p: V2) => `${n1(p[0])} ${n1(p[1])}`;
+const seg = (a: V2, z: V2) => `M${at(a)}L${at(z)}`;
+const closed = (...p: V2[]) => p.map((q, i) => `${i ? "L" : "M"}${at(q)}`).join("") + "Z";
+const box = (x: number, y: number, w: number, h: number) => closed([x, y], [x + w, y], [x + w, y + h], [x, y + h]);
+const oval = (c: V2, rx: number, ry: number) =>
+  `M${at([c[0] - rx, c[1]])}a${n1(rx)} ${n1(ry)} 0 1 0 ${n1(rx * 2)} 0a${n1(rx)} ${n1(ry)} 0 1 0 ${n1(-rx * 2)} 0Z`;
+
 export function RoomLinework({
   layout,
   variant = "paper",
   idPrefix = "room",
+  artId,
   className,
 }: {
   layout: "desktop" | "mobile";
   variant?: "paper" | "thermal";
   idPrefix?: string;
+  /** Id on the drawing's root group, so a lens can reuse it with <use> instead of a second copy. */
+  artId?: string;
   className?: string;
 }) {
   const g = layout === "desktop" ? DESKTOP : MOBILE;
@@ -128,27 +140,74 @@ export function RoomLinework({
   const faint = thermal ? "rgb(255 255 255 / 0.18)" : PAPER.faint;
   const id = (s: string) => `${idPrefix}-${s}`;
   const sw = layout === "desktop" ? 1.4 : 1.6;
+  const floorStep = layout === "desktop" ? 18 : 14;
 
   const winInner = { x1: win.x1 + 10, x2: win.x2 - 10, y1: win.y1 + 10, y2: win.y2 - 8 };
   const mid = (win.x1 + win.x2) / 2;
   const glassW = winInner.x2 - winInner.x1;
+  const glassH = winInner.y2 - winInner.y1;
   const towers = [
     { x: 0.04, w: 0.17, h: 0.74 },
     { x: 0.25, w: 0.12, h: 0.52 },
     { x: 0.41, w: 0.2, h: 0.86 },
     { x: 0.66, w: 0.13, h: 0.6 },
     { x: 0.83, w: 0.14, h: 0.7 },
-  ];
-  const glassH = winInner.y2 - winInner.y1;
+  ].map((t) => {
+    const x = winInner.x1 + glassW * t.x;
+    const w = glassW * t.w;
+    const y = winInner.y2 - glassH * t.h;
+    return { x, w, y };
+  });
+  const towerOutlines = towers.map((t) => box(t.x, t.y, t.w, winInner.y2 - t.y + 4)).join("");
+  const towerFloors = towers
+    .map((t) => {
+      const count = Math.floor((winInner.y2 - t.y) / floorStep);
+      return Array.from({ length: count }, (_, k) => seg([t.x + 4, t.y + 10 + k * floorStep], [t.x + t.w - 4, t.y + 10 + k * floorStep])).join("");
+    })
+    .join("");
+
+  const skY = back.y2 - (back.y2 - back.y1) * b.sk;
+  const edges = [
+    seg([0, 0], [back.x1, back.y1]),
+    seg([W, 0], [back.x2, back.y1]),
+    seg([0, H], [back.x1, back.y2]),
+    seg([W, H], [back.x2, back.y2]),
+    box(back.x1, back.y1, back.x2 - back.x1, back.y2 - back.y1),
+    // Skirting on the back, right and left walls
+    seg([back.x1, skY], [back.x2, skY]),
+    seg(b.R(0, 1 - b.sk), b.R(1, 1 - b.sk)),
+    seg(b.L(0, 1 - b.sk), b.L(1, 1 - b.sk)),
+    // Window frame, glass and the two sliding sashes
+    box(win.x1, win.y1, win.x2 - win.x1, win.y2 - win.y1),
+    box(winInner.x1, winInner.y1, glassW, glassH),
+    seg([mid - 8, winInner.y1], [mid - 8, winInner.y2]),
+    seg([mid + 8, winInner.y1], [mid + 8, winInner.y2]),
+    // Switchboard plate
+    closed(...b.plate),
+  ].join("");
+
+  // Four rocker switches and the round 16A socket, in the plate's own perspective. The plate is about
+  // twice as wide as it is tall, so 0.13 across matches 0.26 down.
+  const half = (a: V2, z: V2) => Math.hypot(z[0] - a[0], z[1] - a[1]) / 2;
+  const switches =
+    [0.07, 0.21, 0.35, 0.49].map((u) => closed(b.P(u, 0.24), b.P(u + 0.1, 0.24), b.P(u + 0.1, 0.76), b.P(u, 0.76))).join("") +
+    oval(b.P(0.8, 0.5), half(b.P(0.67, 0.5), b.P(0.93, 0.5)), half(b.P(0.8, 0.24), b.P(0.8, 0.76)));
+  const pinR = layout === "desktop" ? 1.9 : 1.2;
+  const pins = (
+    [
+      [0.8, 0.37],
+      [0.765, 0.62],
+      [0.835, 0.62],
+    ] as const
+  )
+    .map(([u, v]) => oval(b.P(u, v), pinR, pinR))
+    .join("");
+  const tiles = [...b.depth, ...b.rows].map(([a, z]) => seg(a, z)).join("");
+
+  const fill = (k: string, paper: string) => (thermal ? `url(#${id(k)})` : paper);
 
   return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      preserveAspectRatio="xMidYMid slice"
-      className={className}
-      aria-hidden="true"
-      focusable="false"
-    >
+    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" className={className} aria-hidden="true" focusable="false">
       <defs>
         <clipPath id={id("glass")}>
           <rect x={winInner.x1} y={winInner.y1} width={glassW} height={glassH} />
@@ -188,114 +247,66 @@ export function RoomLinework({
         )}
       </defs>
 
-      {/* Planes */}
-      <g>
-        <polygon points={pts([0, 0], [W, 0], b.TR, b.TL)} fill={thermal ? `url(#${id("g-ceil")})` : PAPER.plane.ceiling} />
-        <polygon points={pts([0, 0], b.TL, b.BL, [0, H])} fill={thermal ? `url(#${id("g-left")})` : PAPER.plane.left} />
-        <rect x={back.x1} y={back.y1} width={back.x2 - back.x1} height={back.y2 - back.y1} fill={thermal ? `url(#${id("g-back")})` : PAPER.plane.back} />
-        <polygon points={pts(b.TR, [W, 0], [W, H], b.BR)} fill={thermal ? `url(#${id("g-right")})` : PAPER.plane.right} />
-        <polygon points={pts(b.BL, b.BR, [W, H], [0, H])} fill={thermal ? `url(#${id("g-floor")})` : PAPER.plane.floor} />
-        <rect x={winInner.x1} y={winInner.y1} width={glassW} height={glassH} fill={thermal ? `url(#${id("g-glass")})` : PAPER.glass} />
+      <g id={artId}>
+        {/* Planes */}
+        <path d={closed([0, 0], [W, 0], b.TR, b.TL)} fill={fill("g-ceil", PAPER.plane.ceiling)} />
+        <path d={closed([0, 0], b.TL, b.BL, [0, H])} fill={fill("g-left", PAPER.plane.left)} />
+        <path d={box(back.x1, back.y1, back.x2 - back.x1, back.y2 - back.y1)} fill={fill("g-back", PAPER.plane.back)} />
+        <path d={closed(b.TR, [W, 0], [W, H], b.BR)} fill={fill("g-right", PAPER.plane.right)} />
+        <path d={closed(b.BL, b.BR, [W, H], [0, H])} fill={fill("g-floor", PAPER.plane.floor)} />
+        <path d={box(winInner.x1, winInner.y1, glassW, glassH)} fill={fill("g-glass", PAPER.glass)} />
         {thermal && (
           <>
             {/* Damp behind the skirting: a cold patch rising from the wall base */}
             <ellipse cx={g.damp.cx} cy={g.damp.cy} rx={g.damp.rx} ry={g.damp.ry} fill={`url(#${id("cold")})`} />
             {/* Unsealed sill joint: a cold streak where the frame meets the stone */}
-            <ellipse cx={mid} cy={win.y2 - 2} rx={(win.x2 - win.x1) * 0.52} ry={layout === "desktop" ? 16 : 12} fill={`url(#${id("cold")})`} />
+            <ellipse cx={mid} cy={win.y2 - 2} rx={n1((win.x2 - win.x1) * 0.52)} ry={layout === "desktop" ? 16 : 12} fill={`url(#${id("cold")})`} />
             {/* Hollow tile: a faint cool patch */}
             <ellipse cx={g.tile.cx} cy={g.tile.cy} rx={g.tile.rx} ry={g.tile.ry} fill={`url(#${id("cool")})`} />
             {/* Mis-wired socket: a warm spot */}
-            <ellipse cx={b.plateC[0]} cy={b.plateC[1]} rx={g.socketRx} ry={g.socketRx * 1.3} fill={`url(#${id("hot")})`} />
+            <ellipse cx={n1(b.plateC[0])} cy={n1(b.plateC[1])} rx={g.socketRx} ry={n1(g.socketRx * 1.3)} fill={`url(#${id("hot")})`} />
           </>
         )}
-      </g>
 
-      {/* View through the window */}
-      <g clipPath={`url(#${id("glass")})`} fill="none" stroke={faint} strokeWidth={sw * 0.8}>
-        {towers.map((t, i) => {
-          const x = winInner.x1 + glassW * t.x;
-          const w = glassW * t.w;
-          const y = winInner.y2 - glassH * t.h;
-          const floors = Math.floor((winInner.y2 - y) / (layout === "desktop" ? 18 : 14));
-          return (
-            <g key={i}>
-              <rect x={x} y={y} width={w} height={winInner.y2 - y + 4} />
-              {Array.from({ length: floors }, (_, k) => (
-                <line key={k} x1={x + 4} x2={x + w - 4} y1={y + 10 + k * (layout === "desktop" ? 18 : 14)} y2={y + 10 + k * (layout === "desktop" ? 18 : 14)} strokeOpacity={0.5} />
-              ))}
-            </g>
-          );
-        })}
-      </g>
+        {/* The view through the window: towers, then their floor lines */}
+        <g clipPath={`url(#${id("glass")})`} fill="none" stroke={faint} strokeWidth={sw * 0.8}>
+          <path d={towerOutlines} />
+          <path d={towerFloors} strokeOpacity={0.5} />
+        </g>
 
-      {/* Room edges */}
-      <g fill="none" stroke={lineColor} strokeWidth={sw} strokeLinejoin="round" vectorEffect="non-scaling-stroke">
-        <line x1={0} y1={0} x2={back.x1} y2={back.y1} />
-        <line x1={W} y1={0} x2={back.x2} y2={back.y1} />
-        <line x1={0} y1={H} x2={back.x1} y2={back.y2} />
-        <line x1={W} y1={H} x2={back.x2} y2={back.y2} />
-        <rect x={back.x1} y={back.y1} width={back.x2 - back.x1} height={back.y2 - back.y1} />
-        {/* Skirting */}
-        <line x1={back.x1} x2={back.x2} y1={back.y2 - (back.y2 - back.y1) * b.sk} y2={back.y2 - (back.y2 - back.y1) * b.sk} />
-        <polyline points={pts(b.R(0, 1 - b.sk), b.R(1, 1 - b.sk))} />
-        <polyline points={pts(b.L(0, 1 - b.sk), b.L(1, 1 - b.sk))} />
-        {/* Window frame and sliding panes */}
-        <rect x={win.x1} y={win.y1} width={win.x2 - win.x1} height={win.y2 - win.y1} rx={2} />
-        <rect x={winInner.x1} y={winInner.y1} width={glassW} height={glassH} />
-        <line x1={mid - 8} x2={mid - 8} y1={winInner.y1} y2={winInner.y2} />
-        <line x1={mid + 8} x2={mid + 8} y1={winInner.y1} y2={winInner.y2} />
-        {/* Switchboard plate */}
-        <polygon points={pts(...b.plate)} />
-      </g>
+        {/* Room edges, skirting, window and switchboard plate */}
+        <path d={edges} fill="none" stroke={lineColor} strokeWidth={sw} strokeLinejoin="round" />
 
-      {/* Granite sill */}
-      <g stroke={lineColor} strokeWidth={sw} vectorEffect="non-scaling-stroke">
-        <polygon
-          points={pts([win.x1 - g.sillOver, win.y2], [win.x2 + g.sillOver, win.y2], [win.x2 + g.sillOver + 8, win.y2 + 9], [win.x1 - g.sillOver - 8, win.y2 + 9])}
-          fill={thermal ? ironbow(0.62) : "#3a4659"}
-        />
-        <rect x={win.x1 - g.sillOver - 8} y={win.y2 + 9} width={win.x2 - win.x1 + (g.sillOver + 8) * 2} height={layout === "desktop" ? 14 : 12} fill={thermal ? ironbow(0.55) : PAPER.sill} />
-      </g>
+        {/* Granite sill */}
+        <g stroke={lineColor} strokeWidth={sw}>
+          <path
+            d={closed([win.x1 - g.sillOver, win.y2], [win.x2 + g.sillOver, win.y2], [win.x2 + g.sillOver + 8, win.y2 + 9], [win.x1 - g.sillOver - 8, win.y2 + 9])}
+            fill={thermal ? ironbow(0.62) : "#3a4659"}
+          />
+          <path d={box(win.x1 - g.sillOver - 8, win.y2 + 9, win.x2 - win.x1 + (g.sillOver + 8) * 2, layout === "desktop" ? 14 : 12)} fill={thermal ? ironbow(0.55) : PAPER.sill} />
+        </g>
 
-      {/* Four rocker switches and the round three-pin 16A socket, in the plate's own perspective */}
-      <g fill="none" stroke={lineColor} strokeWidth={sw * 0.8} strokeLinejoin="round" vectorEffect="non-scaling-stroke">
-        {[0.07, 0.21, 0.35, 0.49].map((u) => (
-          <polygon key={u} points={pts(b.P(u, 0.24), b.P(u + 0.1, 0.24), b.P(u + 0.1, 0.76), b.P(u, 0.76))} />
-        ))}
-        {(() => {
-          const c = b.P(0.8, 0.5);
-          const half = (a: V2, z: V2) => Math.hypot(z[0] - a[0], z[1] - a[1]) / 2;
-          // The plate is about twice as wide as it is tall, so 0.13 across matches 0.26 down.
-          return <ellipse cx={c[0]} cy={c[1]} rx={half(b.P(0.67, 0.5), b.P(0.93, 0.5))} ry={half(b.P(0.8, 0.24), b.P(0.8, 0.76))} />;
-        })()}
-      </g>
-      <g fill={lineColor}>
-        {(
-          [
-            [0.8, 0.37],
-            [0.765, 0.62],
-            [0.835, 0.62],
-          ] as const
-        ).map(([u, v]) => {
-          const c = b.P(u, v);
-          return <circle key={`${u}-${v}`} cx={c[0]} cy={c[1]} r={layout === "desktop" ? 1.9 : 1.2} />;
-        })}
-      </g>
+        <path d={switches} fill="none" stroke={lineColor} strokeWidth={sw * 0.8} strokeLinejoin="round" />
+        <path d={pins} fill={lineColor} />
 
-      {/* Floor tiles */}
-      <g stroke={faint} strokeWidth={sw * 0.8} vectorEffect="non-scaling-stroke">
-        {b.depth.map(([a, z], i) => (
-          <line key={`d${i}`} x1={a[0]} y1={a[1]} x2={z[0]} y2={z[1]} />
-        ))}
-        {b.rows.map(([a, z], i) => (
-          <line key={`r${i}`} x1={a[0]} y1={a[1]} x2={z[0]} y2={z[1]} />
-        ))}
-      </g>
+        {/* Floor tiles */}
+        <path d={tiles} fill="none" stroke={faint} strokeWidth={sw * 0.8} />
 
-      {/* Recessed ceiling light (phone crop only: on desktop the nav pill sits over the ceiling) */}
-      {layout === "mobile" && (
-        <ellipse cx={(back.x1 + back.x2) / 2} cy={back.y1 * 0.5} rx={26} ry={6} fill="none" stroke={faint} strokeWidth={sw} vectorEffect="non-scaling-stroke" />
-      )}
+        {/* Recessed ceiling light (phone crop only: on desktop the nav pill sits over the ceiling) */}
+        {layout === "mobile" && (
+          <ellipse cx={(back.x1 + back.x2) / 2} cy={back.y1 * 0.5} rx={26} ry={6} fill="none" stroke={faint} strokeWidth={sw} vectorEffect="non-scaling-stroke" />
+        )}
+      </g>
+    </svg>
+  );
+}
+
+/** The same drawing again, by reference: the lens shows the thermal drawing without a second copy. */
+export function RoomLineworkRef({ layout, href, className }: { layout: "desktop" | "mobile"; href: string; className?: string }) {
+  const g = layout === "desktop" ? DESKTOP : MOBILE;
+  return (
+    <svg viewBox={`0 0 ${g.W} ${g.H}`} preserveAspectRatio="xMidYMid slice" className={className} aria-hidden="true" focusable="false">
+      <use href={`#${href}`} />
     </svg>
   );
 }
