@@ -506,6 +506,8 @@ export const site = {
     contact: "Contact",
     follow: "Follow",
     year: 2026,
+    /** The wordmark across the foot of the page, in the logo's two colours (decorative, aria-hidden). */
+    wordmark: ["FLAT", "PROOF"] as const,
   },
 
   floatingWa: { label: "Book on WhatsApp" },

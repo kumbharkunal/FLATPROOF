@@ -187,9 +187,23 @@ test("reduced motion: static thermal split, no pins, everything readable", async
   expect(Number(stakesOpacity)).toBe(1);
   await scrollToId(page, "checks", 0);
   await expect(page.locator(".odometer .sr-only")).toHaveText(/125\+/);
+  // The footer wordmark is simply lit: no clip, no scan line.
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(600);
+  expect(await page.locator(".mark-lit").evaluate((el) => getComputedStyle(el).clipPath)).toBe("none");
 });
 
-test("floating WhatsApp: hidden on the hero and at the close, shown in between", async ({ page }) => {
+test("footer wordmark: decorative, and fully lit by the time the page ends", async ({ page }) => {
+  await page.goto("/");
+  await settle(page);
+  await expect(page.locator(".footer-mark-wrap")).toHaveAttribute("aria-hidden", "true");
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(2600);
+  const clip = await page.locator(".mark-lit").evaluate((el) => getComputedStyle(el).clipPath);
+  expect(["none", "inset(0px 0% 0px 0px)", "inset(0px)"]).toContain(clip);
+});
+
+test("floating WhatsApp: hidden on the hero and from the close to the end, shown in between", async ({ page }) => {
   await page.goto("/");
   await settle(page);
   const fab = page.locator(".float-wa");
@@ -197,5 +211,9 @@ test("floating WhatsApp: hidden on the hero and at the close, shown in between",
   await scrollToId(page, "report", 0);
   await expect(fab).toHaveAttribute("data-visible", "true");
   await scrollToId(page, "book", 0);
+  await expect(fab).toHaveAttribute("data-visible", "false");
+  // Over the footer too, where the wordmark sits.
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(900);
   await expect(fab).toHaveAttribute("data-visible", "false");
 });

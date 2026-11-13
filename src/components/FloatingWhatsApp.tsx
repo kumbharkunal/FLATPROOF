@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { gsap, loadST } from "@/lib/gsap";
 import { WhatsappIcon } from "@/components/brand-icons/whatsapp";
 
-// Appears once the hero has scrolled away; hides while the closing call to action is on screen.
+// Appears once the hero has scrolled away; hides from the closing call to action to the end of the
+// page (the booking section and the footer have their own WhatsApp links, and the footer wordmark
+// sits where the button would float).
 export function FloatingWhatsApp({ href, label }: { href: string; label: string }) {
   const [pastHero, setPastHero] = useState(false);
   const [atClose, setAtClose] = useState(false);
@@ -24,6 +26,8 @@ export function FloatingWhatsApp({ href, label }: { href: string; label: string 
         ST.create({
           trigger: "#book",
           start: "top bottom",
+          // The footer's bottom never reaches the top of the screen, so this stays active to the end.
+          endTrigger: "footer.footer",
           end: "bottom top",
           onToggle: (s) => setAtClose(s.isActive),
         });

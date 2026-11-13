@@ -107,7 +107,8 @@ Headings use `text-wrap: balance`, paragraphs `pretty`. Body measure is 68ch at 
 - **Carpet readout and calculator:** agreement, measured, short (clouded); the buyer's own rate gives the rupee value. There is no default rate, so no price is invented.
 - **Services index:** ruled rows, each with its own prefilled WhatsApp message; on desktop a docked preview and a teal measure tick on the active row.
 - **FAQ:** CSS disclosures (grid rows 0fr to 1fr, `inert` when closed).
-- **Floating WhatsApp:** 56px, appears after the hero, hides while the booking section is in view.
+- **Floating WhatsApp:** 56px, appears after the hero, hides from the booking section to the end of the page (FP-D67).
+- **Footer wordmark:** FLATPROOF edge to edge of the content column, a dim navy silhouette lit by a sweeping teal scan line (FLAT silver, PROOF teal), with a reflection below (FP-D66).
 - **Cursor:** fine pointers only; a dot and a lagging ring; links grow the ring; CTAs show a short label beside the pointer, never over the button text (FP-D50); hidden over the hero stage, where the lens takes over.
 
 ## 8. Imagery

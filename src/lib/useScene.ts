@@ -16,13 +16,14 @@ export type SceneCtx = { ST: ST; section: HTMLElement; desktop: boolean; fine: b
  * (pointer, key, wheel, touch or scroll), whichever is first, with an 8s fallback. That keeps
  * their setup work out of the load window, and a nav click (pointerdown comes first) always
  * finds every pin in place before it scrolls.
- * Render the returned ref on a hidden anchor inside the section: <span ref={anchor} hidden />.
+ * Render the returned ref on a hidden anchor inside the section (or the footer):
+ * <span ref={anchor} hidden />.
  */
 export function useScene(setup: (ctx: SceneCtx) => void | (() => void)) {
   const anchor = useRef<HTMLSpanElement>(null);
   useGSAP(
     () => {
-      const section = anchor.current?.closest("section");
+      const section = anchor.current?.closest<HTMLElement>("section, footer");
       if (!section) return;
       let dead = false;
       let started = false;
