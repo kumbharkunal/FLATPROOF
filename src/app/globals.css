@@ -25,7 +25,9 @@
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  --font-sans: var(--font-zalando), var(--font-rupee), "Arial", ui-sans-serif, system-ui, sans-serif;
+  /* The rupee face comes first: its unicode-range holds only ₹, so every other character skips it,
+     and ₹ never sends the browser to Zalando's 38 KB latin-ext file, which has no ₹ (FP-D35, FP-D59). */
+  --font-sans: var(--font-rupee), var(--font-zalando), "Arial", ui-sans-serif, system-ui, sans-serif;
 
   --radius-chip: 8px;
   --radius-input: 12px;
