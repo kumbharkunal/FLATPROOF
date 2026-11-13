@@ -1,0 +1,52 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+
+# next.js
+/.next/
+/out/
+/build
+
+# testing and QA output (QA screenshots live in %LOCALAPPDATA%\flatproof-qa)
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# client reference material and cloned design references (never published)
+/reference/
+/.design-refs/
+/.taste-skill/
+/.gstack/
+/.jury/
+/scrollcraft/
+
+# image inbox: originals stay local; processed files in public/images are committed
+/images-inbox/*
+!/images-inbox/README.md
+!/images-inbox/.gitkeep
+/images-inbox/debug/
