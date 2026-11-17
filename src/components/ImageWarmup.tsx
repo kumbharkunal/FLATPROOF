@@ -16,7 +16,8 @@ export function ImageWarmup() {
     let handle = 0;
     const warm = () => {
       document.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => {
-        img.loading = "eager";
+        // Not rendered on this layout (the services previews on phones): leave it alone.
+        if (img.getClientRects().length) img.loading = "eager";
       });
     };
     const schedule = () => {

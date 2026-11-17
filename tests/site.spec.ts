@@ -314,8 +314,11 @@ test("photos: pre-built static files, never resized on request, fetched before y
   const res = await request.get(first);
   expect(res.status()).toBe(200);
   expect(res.headers()["cache-control"]).toContain("immutable");
-  // Once the page has loaded, every lazy photo further down has been asked for already.
-  await expect.poll(() => page.evaluate(() => document.querySelectorAll('img[loading="lazy"]').length), { timeout: 8000 }).toBe(0);
+  // Once the page has loaded, every lazy photo further down has been asked for already (photos this
+  // layout does not render, like the services previews on phones, are left alone).
+  await expect
+    .poll(() => page.evaluate(() => [...document.querySelectorAll('img[loading="lazy"]')].filter((i) => i.getClientRects().length).length), { timeout: 8000 })
+    .toBe(0);
 });
 
 test("floating WhatsApp: hidden on the hero and from the close to the end, shown in between", async ({ page }) => {
