@@ -22,7 +22,7 @@ Every word, link and number on the page lives in `src/content/site.ts`. Componen
 | `waMessages` | The prefilled WhatsApp texts, copied from vpconstro.com. Every booking link uses one of them through `waHref(key)`. |
 | `contact` | Phone, email, address, Instagram. `facebook.show` stays `false` until FlatProof has a Facebook Page. |
 | `claims` | Business claims with `needsConfirm` and `source`. Everything unconfirmed is listed in `CLIENT_QUESTIONS.md`. |
-| `hero` | Headline, lead, the lens copy and the four findings with their marker points (`at`). |
+| `hero` | Headline, lead, the scan and report-card copy, and the four findings with their marker points (`at`), clouds and label sides. |
 | `stakes` to `footer` | One block per section, in page order. |
 | `faq` | Items with `show: false` stay hidden until the client confirms the answer. |
 | `testimonials` | Empty on purpose. The section renders nothing until real, permitted quotes exist. |
@@ -32,21 +32,21 @@ Copy rules: sentence case, no em or en dashes, no arrows on links or buttons. Ke
 
 ## Add the photos
 
-1. Generate the seven images with the prompts in `IMAGE_PROMPTS.md`.
+1. Generate the eight images with the prompts in `IMAGE_PROMPTS.md`.
 2. Save them in `images-inbox/` with the exact file names given there (`hero-desktop.png`, `hero-mobile.png` and so on). PNG, WebP or JPG all work.
-3. Run `npm run images`. It writes optimised files to `public/images/` (never larger than the source: upscaling only adds bytes), builds the thermal version of each hero photo and its heat grid, and regenerates `src/content/images.generated.ts`. The site switches from placeholders to photos on the next build.
-4. Line up the four defect markers. Run `npm run images -- --debug` and open the four files in `images-inbox/debug/`: each hero photo and its thermal version, with every marker and its revision cloud drawn on. In `site.ts`, for each `hero.findings[]` entry, move `at.desktop` and `at.mobile` (in percent of the image) until the marker sits on its defect, size `cloud` so the cloud frames the object, and size `thermal` so the cold or warm patch covers it. Run `npm run images` again: the thermal patches follow the same points.
+3. Run `npm run images`. It writes a master of each photo to `public/images/` (never larger than the source: upscaling only adds bytes), cuts it into AVIF and WebP files at fixed widths in `public/img/` (the site serves these as static files, cached for a year), and regenerates `src/content/images.generated.ts`. The site switches from placeholders to photos on the next build. A slot whose original is no longer in the inbox keeps its master.
+4. Line up the four defect markers. Run `npm run images -- --debug` and open the two files in `images-inbox/debug/`: each hero photo with every marker and its revision cloud drawn on. In `site.ts`, for each `hero.findings[]` entry, move `at.desktop` and `at.mobile` (in percent of the image) until the marker sits on its defect, and size `cloud` so the cloud frames the object. The scan reaches them left to right, so keep the list in that order on the desktop photo.
 5. If a photo is cropped into a box of another shape and loses its subject, set `focus` on its slot in `site.images` (a CSS object-position such as `"50% 78%"`).
-6. Commit `public/images/` and `src/content/images.generated.ts`. The originals in `images-inbox/` stay out of git.
+6. Commit `public/images/`, `public/img/` and `src/content/images.generated.ts`. The originals in `images-inbox/` stay out of git.
 
-Until both hero photos exist, the hero shows an architectural line drawing of the same room (`src/components/hero/RoomLinework.tsx`), so the thermal lens works from day one. Every other slot shows a designed placeholder.
+Every slot shows a designed placeholder until its file exists; the construction row keeps its line drawing until `construction-site.png` is added.
 
 ## Check it
 
 ```bash
 npm run lint && npm run typecheck   # ESLint and TypeScript
 npm run build && npm run start:qa   # production server on :4410; the QA tools run against it
-npm run test:e2e                    # Playwright: layout from 320 to 1920px, nav, menu, lens, keyboard, axe, reduced motion
+npm run test:e2e                    # Playwright: layout from 320 to 1920px, nav, menu, hero scan, keyboard, axe, photos, reduced motion
 npm run shots -- --w=390 --touch    # a screenshot per section, saved to %LOCALAPPDATA%\flatproof-qa\shots
 npm run size                        # first-load JS for / (budget: 200 KB gzip)
 ```
@@ -61,10 +61,10 @@ Vercel project `flatproof`, served at https://flatproof.vercel.app. Pushes to `m
 
 ```
 src/content/site.ts         all copy, links, findings and image slots
-src/components/hero/        the thermal lens: ThermalLens, useLensEngine, LensPanel, RoomLinework, layout
+src/components/hero/        the hero and its inspection scan: Hero, HeroScan, layout
 src/components/sections/    one server component per section, each with a small *Motion.tsx client island
 src/components/nav/         the floating pill and the phone menu
-src/lib/                    GSAP setup (lazy ScrollTrigger), in-page scrolling, revision clouds, ironbow palette
+src/lib/                    GSAP setup (lazy ScrollTrigger), in-page scrolling, revision clouds, photo srcsets, ironbow palette
 scripts/                    images, logo, icons, screenshots, bundle size
 tests/site.spec.ts          the Playwright suite
 docs/                       brief, approved plan, decisions, progress, design system, pitch notes

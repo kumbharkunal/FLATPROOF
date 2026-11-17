@@ -43,7 +43,7 @@ Each of these is a slot on the page that stays hidden or shows a placeholder unt
 20. **Your team:** names, qualifications and photos of the engineers who do the inspections.
 21. **The full sample report:** can we link the complete PDF of FP-PUNE-2026-088? Please also confirm that its details (Unit 804, Tower B, 3BHK, 1,480 sq ft) are fine to show publicly, or send an anonymised version.
 22. **More site photos** like the window-sill case, with permission to use them.
-23. **VP Constructions:** years in business, a few projects we can name, and real photos for the construction and infrastructure service. Is vpconstructionsllp.com part of your group? We haven't linked it.
+23. **VP Constructions:** years in business, a few projects we can name, and real photos for the construction and infrastructure service (until then that row uses an illustration of site work, never labelled as your project). Is vpconstructionsllp.com part of your group? We haven't linked it.
 
 ## 5. Profiles and listings
 

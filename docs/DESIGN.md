@@ -4,11 +4,11 @@ The tokens and rules the homepage ships with, and why. Source of truth for value
 
 ## 1. Concept
 
-**Beneath the finish.** Every new flat looks finished on handover day. The hero is that bright, perfect flat; a thermal camera shows what the paint hides; the page then goes beneath the surface (ink and navy grounds) and comes back up as proof (a white report).
+**Beneath the finish.** Every new flat looks finished on handover day. The hero is that bright, perfect flat; an inspection scan marks what the paint hides; the page then goes beneath the surface (ink and navy grounds) and comes back up as proof (a white report).
 
-- **Signature, spent once:** the hero lens is an instrument, not a spotlight. An ironbow scale ring with a live needle, lock-on to hidden defects, a "Found n of 4" tally, and each finding linking to its evidence further down.
+- **Signature, spent once:** the hero scan (FP-D69). A teal scan line crosses the photo of the room; each defect it reaches gets a numbered marker and a revision cloud, and its name shows for a moment; beside the photo the snag report fills in, row by row, each row linking to its evidence further down.
 - **Marking device:** the revision cloud, the scalloped outline engineers draw on drawings to flag an issue. Amber, and used for defects only.
-- **Motion verb:** measure. Lines extend, counters land, clouds get drawn, findings lock.
+- **Motion verb:** measure. Lines extend, counters land, clouds get drawn, findings are marked.
 - **Feeling curve:** curiosity (hero), doubt (stakes), confidence (checks), ease (process), control (report), leverage (carpet area), trust (case file), breadth (services), reassurance (FAQ), resolve (book).
 
 ## 2. Colour
@@ -33,7 +33,7 @@ The tokens and rules the homepage ships with, and why. Source of truth for value
 
 Tailwind's default palette is removed (`--color-*: initial`), so only these colours exist.
 
-**Rules.** Teal is never small text: use teal-ink on light and teal-light on dark. Red and amber appear only for defect severity and revision clouds. The ironbow palette (black, indigo, magenta, orange, yellow, white) appears only in thermal imagery and the lens ring. The brief's #017D93 passes on white (4.82) but fails on mist (4.34), so teal-ink is the single small-text teal (FP-D10).
+**Rules.** Teal is never small text: use teal-ink on light and teal-light on dark. Red and amber appear only for defect severity and revision clouds. The ironbow palette (black, indigo, magenta, orange, yellow, white) appears only in thermal imagery (the report's thermal thumbnail and the link-preview image). The brief's #017D93 passes on white (4.82) but fails on mist (4.34), so teal-ink is the single small-text teal (FP-D10).
 
 **Section grounds** (the nav pill reads each section's `data-nav`): hero paper, stakes ink, checks navy, process mist, report paper, carpet area mist, case file ink, services paper, FAQ mist, booking navy, footer ink. Brand navy is the main dark ground, so the page never reads as near-black plus one bright accent (FP-D4).
 
@@ -71,7 +71,7 @@ Headings use `text-wrap: balance`, paragraphs `pretty`. Body measure is 68ch at 
 
 ## 5. Shape and depth
 
-- **Radii by role:** pill 999px (nav, buttons, tags), lens 50%, panel 24px (report sheet, menu sheet), media 16px, input 12px, chip 8px.
+- **Radii by role:** pill 999px (nav, buttons, tags, markers), panel 24px (report sheet, menu sheet), media 16px, input 12px, chip 8px.
 - **Shadows, navy-tinted, only on floating things:** `--shadow-float` (nav pill, floating WhatsApp) and `--shadow-sheet` (report sheet, mini report).
 - **Glass** only on the nav pill and the phone menu sheet: blur plus saturate, a 1px inner highlight, an opaque fallback without `backdrop-filter`. The blur never animates (FP-D9).
 - **Layers:** content 0, floating WhatsApp 40, nav 50, menu 70 to 80, skip link 90.
@@ -85,22 +85,22 @@ Headings use `text-wrap: balance`, paragraphs `pretty`. Body measure is 68ch at 
 | open | 420ms, `cubic-bezier(.16,1,.3,1)` | Menu sheet, disclosures, nav indicator |
 | reveal | 700ms, the same expo out | Hero entrance |
 | draw | 900ms, `cubic-bezier(.65,0,.35,1)` | Revision clouds, dimension lines |
-| lock | 380ms, one overshoot (`back.out`) | The lens locking on a finding |
-| follow | `quickTo` 0.35s power3.out | The lens following the pointer |
+| mark | 420ms, one overshoot (`back.out`) | A hero marker landing on a finding |
+| sweep | linear, 2.4s desktop and 2.6s phone | The hero scan line; a finding is marked when the line reaches it |
 
 **Rules.**
 - Animate only transform, opacity, clip-path and SVG stroke. `will-change` only while a tween runs. Never set a CSS variable on a parent to move children.
 - One orchestrated load: the hero (CSS line-mask rise for the H1, a transform-only lift for the lead and CTAs; no SplitText on the LCP element, FP-D28).
 - Every other section moves only to explain its content: Stakes words light up as you read, with amber underlines on the hidden defects; the tape fills to 125 and the odometer rolls (pinned on desktop screens 860px tall or more); the process line connects the steps; the report findings settle onto the sheet (complete wherever a jump lands, FP-D52); the floor plan draws itself and the deficit gets its cloud; the case photo opens and its clouds draw in turn; the services preview crossfades.
 - GSAP and ScrollTrigger drive scroll; Motion drives only the phone menu (FP-D44). Never both on one element. `scrub: true` (FP-D29). Scenes start near their section or on first interaction (FP-D45).
-- **Reduced motion is gentler, not zero:** crossfades stay; pins, scrubs, loops and the lens go. The hero becomes a static split, daylight left and thermal right, with all four findings shown (FP-D30).
+- **Reduced motion is gentler, not zero:** crossfades stay; pins, scrubs, loops and the scan go. The hero shows the finished scan: all four markers, clouds and report rows (FP-D69).
 
 ## 7. Components
 
 - **Nav pill:** floating glass, centred, safe-area aware. Theme follows the section under it; hides on scroll down after the hero and returns on scroll up; stays through in-page jumps (FP-D51). Sliding active-link indicator (Web Animations FLIP). Phones: logo, "Book" and a 48px menu button that morphs into a full-screen sheet (clip-path), with a focus trap, Esc and scroll lock.
 - **Buttons:** primary is a teal fill with an ink label; secondary is an outline; `secondary-dark` sits on navy and ink. 52px tall (48px for the text-style secondary in the stacked hero). WhatsApp buttons carry the official glyph and say they open a new tab.
-- **Thermal lens:** a circle with a static feathered mask, moved by transform only, holding a counter-translated thermal layer (FP-D27). Ring, needle (relative heat, never a temperature, FP-D14), and an amber chip that names a finding on lock (FP-D55). Desktop follows the pointer; touch runs a tour with drag, tap-to-aim and a visible pause control (FP-D32).
-- **Readout panel:** tally, Thermal view switch (`role="switch"`), the selected finding with how it is found and a link to its evidence, and the "simulated scan" caption. It comes before the stage in the DOM so the switch leads straight to the findings (FP-D49).
+- **Hero scan:** a 2px teal-light line with a soft band behind it crosses the photo at a constant speed (transform only). Each finding's time is its distance from the start, so the line marks it as it passes: an amber marker pops in, its revision cloud draws, and an ink label names it for 1.8 s (on desktop the label comes back on hover). CSS keyframes on `section[data-scan]`; `HeroScan` only starts it (photo decoded and half on screen), keeps the count in step and replays it (FP-D69).
+- **Snag report card:** a "found" counter that rolls 0 to 4, a progress bar tied to the scan, and one row per finding (number, name, how it is found) linking to its evidence; rows are grey placeholders until the scan reaches them. "Scan again" replays it. Wide screens show a compact two-column card under the calls to action; phones and tablets the full list, with the "simulated scan" caption. A row and its marker light up together.
 - **Revision cloud:** generated paths (`src/lib/cloud.ts`), drawn with stroke dash; amber; defects only.
 - **Tape and odometer:** 125 ticks, labels every 25, four segments by trade (28, 32, 38, 27).
 - **Report sheet:** an HTML excerpt of sample report FP-PUNE-2026-088 with meta, three findings, severity tags and the recommended fix. Severity lives in the tag, with no side stripes (FP-D48).
@@ -113,12 +113,12 @@ Headings use `text-wrap: balance`, paragraphs `pretty`. Body measure is 68ch at 
 
 ## 8. Imagery
 
-Seven AI image slots and one real photo (the window-sill case); prompts in `IMAGE_PROMPTS.md`. Shared direction: photoreal, natural daylight, cool clean whites, navy and teal in wardrobe and props, real Pune apartment details. Every slot shows a designed placeholder until its file exists. The two hero photos get thermal twins built by `npm run images`. There are no AI images of VP Constructions projects; that row stays as linework until real photos arrive (FP-D16).
+Eight AI image slots and one real photo (the window-sill case); prompts in `IMAGE_PROMPTS.md`. Shared direction: photoreal, natural daylight, cool clean whites, navy and teal in wardrobe and props, real Pune apartment details. Every slot shows a designed placeholder until its file exists. Photos are pre-built AVIF and WebP files at fixed widths, served as static files and cached for a year; the rest of the page's photos are fetched once it has loaded (FP-D70). The construction service uses an illustration of the work, never presented as a VP Constructions project, and keeps its linework until that file is added (FP-D73).
 
 ## 9. Accessibility
 
-Landmarks, one H1, a skip link, `lang="en-IN"`. Focus ring 2px with a 3px offset: teal on light, teal-light on dark. Tap targets 44px at least (menu 48px). The full keyboard path includes the Thermal view switch and the four findings, and screen readers get an SR-only list of the findings. Every animation has a reduced-motion path. Dimmed text never drops below its contrast floor (FP-D46).
+Landmarks, one H1, a skip link, `lang="en-IN"`. Focus ring 2px with a 3px offset: teal on light, teal-light on dark. Tap targets 44px at least (menu 48px). The full keyboard path runs from the calls to action through Scan again and the four report rows, which are real links in a labelled list (the photo's markers are decorative). Every animation has a reduced-motion path. Dimmed text never drops below its contrast floor (FP-D46).
 
 ## 10. Left out on purpose
 
-A stat row, monospace data labels, eyebrows and all-caps labels, numbered cards outside the real sequence, side-stripe accents, glows behind the lens, pulsing dots, gradient text, and any fake proof: no invented reviews, ratings, prices, certifications, team names or logos.
+A stat row, monospace data labels, eyebrows and all-caps labels, numbered cards outside the real sequence, side-stripe accents, glows behind images, pulsing dots, gradient text, and any fake proof: no invented reviews, ratings, prices, certifications, team names or logos.
