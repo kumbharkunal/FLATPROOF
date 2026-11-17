@@ -33,10 +33,13 @@ export function HeroScan() {
     const run = () => {
       clear();
       delete hero.dataset.replay;
-      // Back to the start, then run: re-adding "run" restarts every CSS animation.
+      // Back to the start (the counter snaps to 0 rather than counting down), then run: re-adding
+      // "run" restarts every CSS animation.
       hero.dataset.scan = "ready";
+      if (digits) digits.style.transition = "none";
       count(0);
       void hero.offsetWidth;
+      if (digits) digits.style.transition = "";
       hero.dataset.scan = "run";
       const wide = matchMedia(HERO_WIDE).matches;
       const sweep = Number(wide ? hero.dataset.sweepD : hero.dataset.sweepM);

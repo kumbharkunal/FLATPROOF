@@ -162,7 +162,7 @@ test("hero scan: marks all four defects, the report links each to its evidence, 
   for (const m of await page.locator(".marker").all()) await expect(m).toHaveCSS("opacity", "1");
   await page.locator(".scan-replay").click();
   await expect(hero).toHaveAttribute("data-scan", "run");
-  expect(await foundCount(page)).toBeLessThan(4);
+  await expect.poll(() => foundCount(page)).toBeLessThan(4);
   await expect(hero).toHaveAttribute("data-scan", "done", { timeout: 12_000 });
   expect(await foundCount(page)).toBe(4);
 });
