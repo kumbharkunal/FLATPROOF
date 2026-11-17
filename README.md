@@ -39,7 +39,7 @@ Copy rules: sentence case, no em or en dashes, no arrows on links or buttons. Ke
 5. If a photo is cropped into a box of another shape and loses its subject, set `focus` on its slot in `site.images` (a CSS object-position such as `"50% 78%"`).
 6. Commit `public/images/`, `public/img/` and `src/content/images.generated.ts`. The originals in `images-inbox/` stay out of git.
 
-Every slot shows a designed placeholder until its file exists; the construction row keeps its line drawing until `construction-site.png` is added.
+Every slot shows a designed placeholder until its file exists (a service row without a photo shows a line drawing instead).
 
 ## Check it
 

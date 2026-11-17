@@ -113,7 +113,7 @@ Headings use `text-wrap: balance`, paragraphs `pretty`. Body measure is 68ch at 
 
 ## 8. Imagery
 
-Eight AI image slots and one real photo (the window-sill case); prompts in `IMAGE_PROMPTS.md`. Shared direction: photoreal, natural daylight, cool clean whites, navy and teal in wardrobe and props, real Pune apartment details. Every slot shows a designed placeholder until its file exists. Photos are pre-built AVIF and WebP files at fixed widths, served as static files and cached for a year; the rest of the page's photos are fetched once it has loaded (FP-D70). The construction service uses an illustration of the work, never presented as a VP Constructions project, and keeps its linework until that file is added (FP-D73).
+Eight AI image slots and one real photo (the window-sill case); prompts in `IMAGE_PROMPTS.md`. Shared direction: photoreal, natural daylight, cool clean whites, navy and teal in wardrobe and props, real Pune apartment details. Every slot shows a designed placeholder until its file exists. Photos are pre-built AVIF and WebP files at fixed widths, served as static files and cached for a year; the rest of the page's photos are fetched once it has loaded (FP-D70). The construction service uses an illustration of site work, never presented as a VP Constructions project (FP-D73).
 
 ## 9. Accessibility
 
