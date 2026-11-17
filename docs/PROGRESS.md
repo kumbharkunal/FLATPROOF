@@ -5,7 +5,7 @@ Resume point for any new session or after compaction: read `docs/BRIEF.md`, then
 | M | Work | Status | Notes |
 |---|---|---|---|
 | 0 | Git, IMAGE_PROMPTS.md (pushed first), BRIEF, CLAUDE, PLAN, PROGRESS, DECISIONS | done | Repo existed, private and empty |
-| 1 | Scaffold Next 16.4.6, deps, Vercel project `flatproof`, claim URL, Git link | done, one blocker | flatproof.vercel.app is ours. `vercel git connect` refused: the Vercel GitHub App has no access to the private repo (needs the user). CLI deploys meanwhile |
+| 1 | Scaffold Next 16.4.6, deps, Vercel project `flatproof`, claim URL, Git link | done | flatproof.vercel.app is ours. Git link done 2026-11-17, once the Vercel GitHub App was given the repo; CLI deploys until then |
 | 2 | Tokens, fonts (gate), content model, logo, theSVG icons, favicons, OG | done | Zalando Sans + rupee-only Hind fallback (FP-D35) |
 | 3 | Image pipeline, placeholders, thermal twins, room linework | done | `npm run images`; thermal path tested with a synthetic room |
 | 4 | Smooth scroll, nav pill, phone menu, cursor, scrollbar, floating WhatsApp | done | |
@@ -23,9 +23,9 @@ Resume point for any new session or after compaction: read `docs/BRIEF.md`, then
 - 2026-11-13: M11 done. Handover docs written; production deployed four times by CLI (docs, then the three launch fixes). `vercel git connect` retried after the last deploy: still refused (no GitHub App access to the private repo).
 - 2026-11-14: Photos added (all seven, at ChatGPT's sizes: 1122 to 1672px). Hotspots, clouds and thermal patches calibrated on both hero photos; desktop crop keeps every finding in frame; landscape tablets get a two-column hero; photos no longer upscaled; crop focus per slot; hero photo eager. FP-D60 to FP-D65. QA moved to port 4410 (4400 is PDI PRO INDIA). Phone hero at quality 60. Live (main `2f34669`): Playwright 17/17 against the live URL; Lighthouse mobile 93 to 98 (median 96) / 100 / 100, TBT 40 to 120 ms, CLS 0 to 0.004, simulated LCP 2.3 to 3.1 s with the photo really painted at 0.54 to 0.81 s. Vercel keeps optimised images across deployments (HIT straight after a redeploy), so the one-time warm-up of the hero variants holds.
 - 2026-11-14: FLATPROOF wordmark across the foot of the page, lit by a teal scan line with a reflection; the floating WhatsApp button now stays hidden over the footer (FP-D66, FP-D67). The dot-and-ring cursor replaced by the normal arrow and hand in brand teal, CSS only (FP-D68). Both deployed; the suite passes on the live URL (21 passed, 3 skipped by design).
+- 2026-11-17: Repo made public by the user and the Vercel GitHub App given access to it; `vercel git connect` linked the project (production branch `main`). Pushes to `main` now deploy on their own.
 
 ## Open items for the user
-- Give the Vercel GitHub App access to `kumbharkunal/FLATPROOF` (GitHub, Settings, Applications, Vercel, Configure, Repository access), then run `vercel git connect` or link it under the project's Git settings. Until then, deploy with `vercel deploy --prod`.
 - Optional: regenerate the two hero photos at a larger size if a tool can (the desktop one is 1672px wide and looks soft on 2560px screens).
 - Client questions: `CLIENT_QUESTIONS.md` (30 questions).
 - Optional: a jury-style scored review of the live URL (needs a separate critic agent).

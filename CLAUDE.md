@@ -1,7 +1,7 @@
 # FlatProof Inspections: pitch homepage
 
 One-page demo for FlatProof Inspections (Pune and PCMC, "a product of VP Constructions"), a pre-possession flat inspection service. Concept: **"Beneath the finish."**
-- **Repo:** github.com/kumbharkunal/FLATPROOF (private). Remote URL includes the username (`https://kumbharkunal@github.com/...`) so Git Credential Manager picks the right account.
+- **Repo:** github.com/kumbharkunal/FLATPROOF. Remote URL includes the username (`https://kumbharkunal@github.com/...`) so Git Credential Manager picks the right account.
 - **Host:** flatproof.vercel.app (Vercel project `flatproof`, team "Kunal's projects").
 - **Resume after any compaction:** read `docs/BRIEF.md`, then `docs/PROGRESS.md`, then `docs/PLAN.md` (the approved plan) and `docs/DECISIONS.md`.
 
@@ -52,4 +52,4 @@ npm run size                             # gzipped first-load JS for /
 ```
 QA output always goes to `%LOCALAPPDATA%\flatproof-qa\` (outside OneDrive).
 
-**Deploy:** pushes to `main` deploy through the Vercel Git integration once connected; otherwise `vercel deploy --prod`.
+**Deploy:** pushes to `main` deploy through the Vercel Git integration (connected 2026-11-17). `vercel deploy --prod` is the manual fallback.

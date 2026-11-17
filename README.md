@@ -55,7 +55,7 @@ Targets: Lighthouse mobile performance 90 or more, accessibility and best practi
 
 ## Deploy
 
-Vercel project `flatproof`, served at https://flatproof.vercel.app. Pushes to `main` deploy on their own once the Vercel GitHub app has access to this private repository. Until then, deploy from the CLI with `vercel deploy --prod`.
+Vercel project `flatproof`, served at https://flatproof.vercel.app. Pushes to `main` deploy on their own through the Vercel GitHub app; `vercel deploy --prod` deploys from the CLI if you ever need to.
 
 ## Where things are
 
