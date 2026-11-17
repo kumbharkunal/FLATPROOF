@@ -120,7 +120,21 @@ export const images: Record<string, ProcessedImage | null> = {
       1254
     ]
   },
-  "construction-site": null,
+  "construction-site": {
+    "src": "/images/construction-site.jpg",
+    "width": 1121,
+    "height": 1401,
+    "blur": "data:image/webp;base64,UklGRiYBAABXRUJQVlA4IBoBAADQBQCdASoYAB4APu1kqU2ppaOiMAgBMB2JQBS2AQHKWOwysRbiom2lVhdSJfZJKSdabR+gAl5AAP7J/kYDhOQ2tQpKJBfs2D3UT3z17soaCGVPxjKJdynd9wg2KVTe3Ovnw8FkQAyUkBEfFARfuA7QeJjROTFbyZ6usgvj57spbwZfIYocUZyegbIzQg/iUzRG9xj9VRU9uBLAqQh/kiAm9tnPgJaKn2NIWlMfxR49UtJviJrCsn3E4+Ry7QpKmhwk1H66VjePG1/Gy3LCIrbUw2kKQ/IxUf8AfG/Hco926+Z+e0SxVkPfjC2NFGnLNhynbCUPPNM2LugSv+uIXxFCDFhB+4rA3UJZ+/sz1BRKdKPeTsPXE0b4AAA=",
+    "base": "/img/construction-site-cf5b5f4d",
+    "widths": [
+      320,
+      480,
+      640,
+      828,
+      1080,
+      1121
+    ]
+  },
   "case-window-sill": {
     "src": "/images/case-window-sill.jpg",
     "width": 1200,
