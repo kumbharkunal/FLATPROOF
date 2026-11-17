@@ -1,10 +1,23 @@
 {
   "$schema": "https://github.com/garrytan/gstack/docs/pregate.md#pregate-v1",
   "dependencies": {
-    "src/**": ["tests/site.spec.ts"],
-    "public/**": ["tests/site.spec.ts"],
-    "scripts/**": ["tests/site.spec.ts"],
-    "package.json": ["tests/site.spec.ts"],
-    "playwright.config.ts": ["tests/site.spec.ts"]
+    "src/**": [
+      "tests/site.spec.ts"
+    ],
+    "public/**": [
+      "tests/site.spec.ts"
+    ],
+    "scripts/**": [
+      "tests/site.spec.ts"
+    ],
+    "package.json": [
+      "tests/site.spec.ts"
+    ],
+    "playwright.config.ts": [
+      "tests/site.spec.ts"
+    ],
+    "next.config.ts": [
+      "tests/site.spec.ts"
+    ]
   }
 }
