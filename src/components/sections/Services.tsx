@@ -1,3 +1,4 @@
+import { images } from "@/content/images.generated";
 import { site, type ImageKey } from "@/content/site";
 import { Photo } from "@/components/ui/Photo";
 import { WhatsAppButton } from "@/components/ui/Button";
@@ -35,7 +36,8 @@ export function Services() {
           <div className="svc-preview" aria-hidden="true">
             {s.items.map((it, i) => (
               <div key={it.id} className="svc-frame" data-id={it.id} data-active={i === 0 ? "true" : "false"}>
-                {it.image ? (
+                {/* Until its photo arrives (IMAGE_PROMPTS.md), a row keeps a line drawing of its work. */}
+                {it.image && images[it.image] ? (
                   <Photo slot={it.image as ImageKey} sizes="(min-width: 1024px) 34vw, 0px" />
                 ) : (
                   <div className="photo placeholder placeholder-mist">

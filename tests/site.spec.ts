@@ -83,6 +83,8 @@ test("layout: no sideways scroll and 44px tap targets from 320 to 1920", async (
 test("accessibility: no serious or critical axe violations", async ({ page }) => {
   await page.goto("/");
   await settle(page);
+  // Measured at rest: mid-scan, a row or label that is still fading in has partial contrast.
+  await expect(page.locator("section.hero")).toHaveAttribute("data-scan", "done", { timeout: 12_000 });
   await page.addScriptTag({ path: AXE });
   const violations = await page.evaluate(async () => {
     // @ts-expect-error axe is injected above
@@ -138,50 +140,52 @@ test("nav theme follows the section under the pill", async ({ page }) => {
   }
 });
 
-test("hero lens: sweeping the camera finds all four defects", async ({ page }, info) => {
-  test.skip(info.project.name !== "desktop", "pointer lens");
-  await page.goto("/");
-  await settle(page, 1600);
-  const box = await page.evaluate(() => {
-    const r = document.querySelector(".hero-overlay")!.getBoundingClientRect();
-    return { l: r.left, t: r.top, w: r.width, h: r.height };
+// How many digits the "found" odometer shows (each digit is 1.25em tall).
+async function foundCount(page: Page) {
+  return page.locator(".scan-digits").evaluate((d) => {
+    const ty = new DOMMatrix(getComputedStyle(d).transform).m42;
+    return Math.round(-ty / (parseFloat(getComputedStyle(d).fontSize) * 1.25));
   });
-  const spots = await page.evaluate(() =>
-    [...document.querySelectorAll<HTMLElement>(".marker")].map((m) => {
-      const cs = getComputedStyle(m);
-      return [parseFloat(cs.getPropertyValue("--xd")), parseFloat(cs.getPropertyValue("--yd"))];
-    }),
-  );
-  for (const [x, y] of spots) {
-    await page.mouse.move(box.l + (box.w * x) / 100, box.t + (box.h * y) / 100, { steps: 12 });
-    await page.waitForTimeout(700);
-  }
-  await expect(page.locator(".tally")).toContainText("Found 4 of 4");
-  await expect(page.locator(".marker[data-shown='true']")).toHaveCount(4);
-});
+}
 
-test("thermal view switch works from the keyboard", async ({ page }) => {
+test("hero scan: marks all four defects, the report links each to its evidence, Scan again replays", async ({ page }, info) => {
   await page.goto("/");
-  await settle(page);
-  const sw = page.getByRole("switch", { name: "Thermal view" });
-  await sw.focus();
-  await page.keyboard.press("Space");
-  await expect(sw).toHaveAttribute("aria-checked", "true");
-  await expect(page.locator(".tally")).toContainText("Found 4 of 4");
-  await expect(page.locator(".hero-lens")).toHaveAttribute("data-thermal", "on");
-  // Focus goes from the switch into the findings (past the selected finding's link, if one is open).
-  await page.keyboard.press("Tab");
-  if (await page.evaluate(() => !!document.activeElement?.closest(".hero-panel"))) await page.keyboard.press("Tab");
-  await expect(page.locator(".marker").first()).toBeFocused();
-  await expect(page.locator(".marker").first()).toBeVisible();
+  const hero = page.locator("section.hero");
+  // Phones: bring the photo into view, as a first scroll would.
+  if (info.project.name === "phone") await page.evaluate(() => window.scrollTo(0, 300));
+  await expect(hero).toHaveAttribute("data-scan", "done", { timeout: 12_000 });
+  expect(await foundCount(page)).toBe(4);
+  const rows = page.locator(".scan-row");
+  await expect(rows).toHaveCount(4);
+  for (const r of await rows.all()) await expect(r).toHaveCSS("opacity", "1");
+  expect(await rows.evaluateAll((els) => els.map((e) => e.getAttribute("href")))).toEqual(["#case", "#report", "#checks", "#checks"]);
+  for (const m of await page.locator(".marker").all()) await expect(m).toHaveCSS("opacity", "1");
+  await page.locator(".scan-replay").click();
+  await expect(hero).toHaveAttribute("data-scan", "run");
+  expect(await foundCount(page)).toBeLessThan(4);
+  await expect(hero).toHaveAttribute("data-scan", "done", { timeout: 12_000 });
+  expect(await foundCount(page)).toBe(4);
 });
 
-test("reduced motion: static thermal split, no pins, everything readable", async ({ page }) => {
+test("hero: the report rows follow the calls to action in keyboard order and light their marker", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("section.hero")).toHaveAttribute("data-scan", "done", { timeout: 12_000 });
+  await page.locator(".hero-ctas .hero-secondary").focus();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Scan again" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.locator(".scan-row").first()).toBeFocused();
+  await expect(page.locator(".marker").first()).toHaveAttribute("data-hot", "");
+});
+
+test("reduced motion: findings shown at once, no pins, everything readable", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await settle(page);
-  await expect(page.locator(".hero-lens")).toHaveAttribute("data-mode", "static");
-  await expect(page.locator(".marker[data-shown='true']")).toHaveCount(4);
+  await expect(page.locator("section.hero")).toHaveAttribute("data-scan", "done");
+  for (const m of await page.locator(".marker").all()) await expect(m).toHaveCSS("opacity", "1");
+  for (const r of await page.locator(".scan-row").all()) await expect(r).toHaveCSS("opacity", "1");
+  await expect(page.locator(".scan-replay")).toBeHidden();
   expect(await page.locator(".pin-spacer").count()).toBe(0);
   const stakesOpacity = await page.locator(".stakes-body").evaluate((el) => getComputedStyle(el).opacity);
   expect(Number(stakesOpacity)).toBe(1);
@@ -245,6 +249,73 @@ test("cursor: the normal arrow and hand in brand teal, the system caret in text 
     );
   }, [r.page, r.link]);
   expect(sizes).toEqual([32, 64, 32, 64]);
+});
+
+// Scroll so an element's top (or centre) sits at a share of the screen's height.
+async function placeAt(page: Page, sel: string, share: number, edge: "top" | "center" = "top") {
+  await page.evaluate(
+    ([s, f, e]) => {
+      const r = document.querySelector(s)!.getBoundingClientRect();
+      window.scrollTo(0, (e === "center" ? r.top + r.height / 2 : r.top) + window.scrollY - window.innerHeight * Number(f));
+    },
+    [sel, String(share), edge] as const,
+  );
+}
+
+test("process: the line reaches step 3 while the numbers are still on screen", async ({ page }, info) => {
+  await page.goto("/");
+  await settle(page, 600);
+  // Desktop: the number row at 40% of the screen. Phones: the third number at half height.
+  if (info.project.name === "desktop") await placeAt(page, ".steps-line", 0.4);
+  else await placeAt(page, ".step:nth-child(3) .step-num", 0.5);
+  await expect(page.locator(".step-num.on")).toHaveCount(3, { timeout: 5000 });
+  const top = await page.locator(".step-num").nth(2).evaluate((n) => n.getBoundingClientRect().top);
+  expect(top).toBeGreaterThan(0);
+  expect(top).toBeLessThan(await page.evaluate(() => innerHeight));
+});
+
+test("case file: clouds a, b and c are all drawn while the whole photo is on screen", async ({ page }) => {
+  await page.goto("/");
+  await settle(page, 600);
+  await placeAt(page, ".case-photo", 0.95);
+  await page.waitForTimeout(500);
+  await placeAt(page, ".case-photo", 0.66, "center");
+  await expect
+    .poll(() => page.locator(".case-clouds path").evaluateAll((ps) => ps.map((p) => Math.round(parseFloat(getComputedStyle(p).strokeDashoffset) * 100))), { timeout: 5000 })
+    .toEqual([0, 0, 0]);
+  const box = (await page.locator(".case-photo").boundingBox())!;
+  expect(box.y).toBeGreaterThanOrEqual(0);
+  expect(box.y + box.height).toBeLessThanOrEqual(await page.evaluate(() => innerHeight + 1));
+});
+
+test("report: on a 320px phone the sample stamp and the sheet title each stay on one line", async ({ page }, info) => {
+  test.skip(info.project.name !== "phone", "phone layout");
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto("/");
+  for (const sel of [".sheet-stamp", ".sheet-heading"]) {
+    const lines = await page.locator(sel).evaluate((el) => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      return new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size;
+    });
+    expect(lines, sel).toBe(1);
+  }
+});
+
+test("photos: pre-built static files, never resized on request, fetched before you reach them", async ({ page, request }) => {
+  await page.goto("/");
+  const refs = await page.evaluate(() =>
+    [...document.querySelectorAll("img, source")].flatMap((el) => [el.getAttribute("src") ?? "", el.getAttribute("srcset") ?? ""]).join(" "),
+  );
+  expect(refs).not.toContain("/_next/image");
+  const avif = await page.locator('picture source[type="image/avif"]').first().getAttribute("srcset");
+  const first = avif!.split(",")[0].trim().split(" ")[0];
+  expect(first).toMatch(/^\/img\/.+-[0-9a-f]{8}-\d+\.avif$/);
+  const res = await request.get(first);
+  expect(res.status()).toBe(200);
+  expect(res.headers()["cache-control"]).toContain("immutable");
+  // Once the page has loaded, every lazy photo further down has been asked for already.
+  await expect.poll(() => page.evaluate(() => document.querySelectorAll('img[loading="lazy"]').length), { timeout: 8000 }).toBe(0);
 });
 
 test("floating WhatsApp: hidden on the hero and from the close to the end, shown in between", async ({ page }) => {

@@ -10,12 +10,10 @@
 
 export type Claim = { value: string; needsConfirm: boolean; source: string };
 export type Point = { x: number; y: number }; // percentages of the image box
-/** Spread of a thermal anomaly (Gaussian sigma) in % of the image's width and height. */
-export type Spread = { rx: number; ry: number };
-/** The anomaly `npm run images` paints into each hero photo's thermal twin, at that photo's hotspot. */
-export type Thermal = { kind: "cold" | "warm"; strength: number; desktop: Spread; mobile: Spread };
 /** Revision-cloud radii, both in % of the image width. */
 export type Cloud = readonly [rx: number, ry: number];
+/** Which side of its marker a finding's label sits on while the scan names it. */
+export type Side = "left" | "right" | "top";
 
 export type Finding = {
   id: "damp" | "socket" | "tile" | "sill";
@@ -23,11 +21,12 @@ export type Finding = {
   body: string;
   method: string;
   link: { label: string; href: string };
-  thermal: Thermal;
-  /** Hotspot per image. `linework` is the SVG placeholder room, used while a hero photo is missing. */
-  at: { desktop: Point; mobile: Point; lineworkDesktop: Point; lineworkMobile: Point };
-  /** Cloud size per image, so it frames the object it marks (a sill is a third of the desktop photo). */
-  cloud: { desktop: Cloud; mobile: Cloud; lineworkDesktop: Cloud; lineworkMobile: Cloud };
+  /** Point per hero photo (the scan finds them left to right, so this also sets the order). */
+  at: { desktop: Point; mobile: Point };
+  /** Cloud size per photo, so it frames the object it marks (a sill is a third of the desktop photo). */
+  cloud: { desktop: Cloud; mobile: Cloud };
+  /** Label side per photo, clear of the other findings. */
+  tag: { desktop: Side; mobile: Side };
 };
 
 export type ImageSlot = {
@@ -36,7 +35,8 @@ export type ImageSlot = {
   height: number;
   alt: string;
   usedIn: string;
-  thermal?: boolean;
+  /** A hero photo: the findings are placed on it, so its crop stays centred. */
+  hero?: boolean;
   real?: boolean;
   /** Where to anchor the crop when a box of another shape shows the photo (CSS object-position). */
   focus?: string;
@@ -126,22 +126,29 @@ export const site = {
     lead: "Two engineers check your new flat against 125+\u00a0points, scan the walls with a thermal camera and measure the carpet area by laser. You get a snag report for your builder within 24\u00a0hours.",
     primary: { label: "Book on WhatsApp", wa: "book" as WaKey },
     secondary: { label: "See a sample report", href: "#report" },
-    lens: {
-      hintPointer: "Move the camera over the room",
-      hintTouch: "Drag the camera or tap the photo",
-      hintMore: "Or turn on Thermal view to see all four at once.",
-      toggle: "Thermal view",
-      pause: "Pause scan",
-      play: "Play scan",
-      scanning: "Scanning",
-      found: "Found {n} of {total}",
-      complete: "Your inspection covers 125+ points.",
-      completeLink: { label: "See all 125+ checks", href: "#checks" },
+    // The inspection scan over the photo (FP-D69): a scan line crosses the room, marks each defect
+    // where the finish hides it, and the snag report fills in beside the photo.
+    scan: {
+      title: "Snag report",
+      found: "found",
+      replay: "Scan again",
+      listLabel: "Defects the scan marks in this room",
+      more: { label: "See all 125+ checks", href: "#checks" },
       caption: "Simulated scan for illustration. The defects are real ones from our checklist and site visits.",
-      srIntro: "What the thermal camera finds in this room",
-      stageLabel: "A new flat with four hidden defects. Use the Thermal view switch to see all of them.",
     },
+    // In the order the scan reaches them on the desktop photo (left to right), which numbers them.
     findings: [
+      {
+        id: "sill",
+        title: "Sill set on loose filler",
+        body: "Loose white cement under the granite and no seal at the frame. Rain can get in at that joint.",
+        method: "Tap test and visual check",
+        link: { label: "See the case file", href: "#case" },
+        // Photos: the middle of the granite sill, along its full length.
+        at: { desktop: { x: 62.6, y: 56 }, mobile: { x: 32.3, y: 49.8 } },
+        cloud: { desktop: [19.8, 2.2], mobile: [29.5, 3] },
+        tag: { desktop: "top", mobile: "top" },
+      },
       {
         id: "damp",
         title: "Damp behind the skirting",
@@ -149,30 +156,9 @@ export const site = {
         method: "Thermal camera and moisture meter",
         link: { label: "See the sample report", href: "#report" },
         // Photos: just above the back-wall skirting, under the window's right side.
-        thermal: { kind: "cold", strength: 0.85, desktop: { rx: 4.5, ry: 5 }, mobile: { rx: 5.5, ry: 4 } },
-        at: {
-          desktop: { x: 70, y: 74.5 },
-          mobile: { x: 57, y: 69.3 },
-          lineworkDesktop: { x: 69.4, y: 71 },
-          lineworkMobile: { x: 68.5, y: 74.4 },
-        },
-        cloud: { desktop: [6.2, 3.4], mobile: [10, 5], lineworkDesktop: [7.5, 3.8], lineworkMobile: [14, 6.5] },
-      },
-      {
-        id: "socket",
-        title: "Socket wired the wrong way",
-        body: "Neutral and earth reversed, earthing inactive. Appliances can get damaged.",
-        method: "Polarity test",
-        link: { label: "See the electrical checks", href: "#checks" },
-        // Photos: the centre of the switchboard plate on the right wall.
-        thermal: { kind: "warm", strength: 0.9, desktop: { rx: 1.4, ry: 2.2 }, mobile: { rx: 1.8, ry: 1.4 } },
-        at: {
-          desktop: { x: 95.2, y: 52.5 },
-          mobile: { x: 91.4, y: 51.3 },
-          lineworkDesktop: { x: 76.4, y: 55 },
-          lineworkMobile: { x: 87, y: 55.3 },
-        },
-        cloud: { desktop: [4.4, 3.1], mobile: [6.6, 4.2], lineworkDesktop: [3.7, 2.4], lineworkMobile: [6, 5] },
+        at: { desktop: { x: 70, y: 74.5 }, mobile: { x: 57, y: 69.3 } },
+        cloud: { desktop: [6.2, 3.4], mobile: [10, 5] },
+        tag: { desktop: "left", mobile: "left" },
       },
       {
         id: "tile",
@@ -181,30 +167,20 @@ export const site = {
         method: "Acoustic tap test",
         link: { label: "See the masonry checks", href: "#checks" },
         // Photos: one whole tile in the foreground, between grout lines.
-        thermal: { kind: "cold", strength: 0.35, desktop: { rx: 6, ry: 3 }, mobile: { rx: 9, ry: 2.6 } },
-        at: {
-          desktop: { x: 78, y: 90.5 },
-          mobile: { x: 46, y: 93 },
-          lineworkDesktop: { x: 77.3, y: 85.9 },
-          lineworkMobile: { x: 50, y: 90.5 },
-        },
-        cloud: { desktop: [7.5, 3], mobile: [13, 4.4], lineworkDesktop: [5.2, 2.5], lineworkMobile: [15, 4.6] },
+        at: { desktop: { x: 78, y: 90.5 }, mobile: { x: 46, y: 93 } },
+        cloud: { desktop: [7.5, 3], mobile: [13, 4.4] },
+        tag: { desktop: "right", mobile: "top" },
       },
       {
-        id: "sill",
-        title: "Sill set on loose filler",
-        body: "Loose white cement under the granite and no seal at the frame. Rain can get in at that joint.",
-        method: "Tap test and visual check",
-        link: { label: "See the case file", href: "#case" },
-        // Photos: the middle of the granite sill, along its full length.
-        thermal: { kind: "cold", strength: 0.6, desktop: { rx: 9.5, ry: 1.3 }, mobile: { rx: 14, ry: 0.9 } },
-        at: {
-          desktop: { x: 62.6, y: 56 },
-          mobile: { x: 32.3, y: 49.8 },
-          lineworkDesktop: { x: 61, y: 44.6 },
-          lineworkMobile: { x: 50, y: 30.2 },
-        },
-        cloud: { desktop: [19.8, 2.2], mobile: [29.5, 3], lineworkDesktop: [12.6, 2], lineworkMobile: [28, 3.6] },
+        id: "socket",
+        title: "Socket wired the wrong way",
+        body: "Neutral and earth reversed, earthing inactive. Appliances can get damaged.",
+        method: "Polarity test",
+        link: { label: "See the electrical checks", href: "#checks" },
+        // Photos: the centre of the switchboard plate on the right wall.
+        at: { desktop: { x: 95.2, y: 52.5 }, mobile: { x: 91.4, y: 51.3 } },
+        cloud: { desktop: [4.4, 3.1], mobile: [6.6, 4.2] },
+        tag: { desktop: "left", mobile: "left" },
       },
     ] satisfies Finding[],
   },
@@ -437,7 +413,9 @@ export const site = {
         byline: "By VP Constructions",
         summary: "Turnkey homes and commercial buildings, roads and civic projects.",
         wa: "construction" as WaKey,
-        image: null, // TODO(client): real VP Constructions project photos (FP-D16)
+        // An illustration of the work until real project photos arrive. TODO(client): real VP
+        // Constructions project photos (FP-D16, FP-D73).
+        image: "construction-site",
       },
     ],
   },
@@ -525,7 +503,7 @@ export const site = {
       height: 1440,
       alt: "An empty new flat in Pune on handover day: a plain wall, a sliding window over a black granite sill, a switchboard and glossy floor tiles.",
       usedIn: "Hero, tablets and desktops",
-      thermal: true,
+      hero: true,
     },
     "hero-mobile": {
       file: "hero-mobile",
@@ -533,7 +511,7 @@ export const site = {
       height: 2000,
       alt: "An empty new flat in Pune on handover day: a sliding window over a black granite sill, a switchboard, skirting and glossy floor tiles.",
       usedIn: "Hero, phones",
-      thermal: true,
+      hero: true,
     },
     "engineer-thermal": {
       file: "engineer-thermal",
@@ -572,6 +550,13 @@ export const site = {
       height: 2000,
       alt: "A crack-width gauge held against a hairline crack in a plastered wall.",
       usedIn: "Consultancy service",
+    },
+    "construction-site": {
+      file: "construction-site",
+      width: 1600,
+      height: 2000,
+      alt: "A site engineer in a hard hat checks the steel reinforcement of a concrete column on a residential building site.",
+      usedIn: "Construction service (an illustration, not a VP Constructions project)",
     },
     "case-window-sill": {
       file: "case-window-sill",

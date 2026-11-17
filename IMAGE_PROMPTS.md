@@ -1,15 +1,15 @@
 # Image prompts: FlatProof homepage
 
-Seven AI images for the homepage. Each prompt below is complete on its own: open a **new** ChatGPT chat, paste one code block, download the result.
+Eight AI images for the homepage. Each prompt below is complete on its own: open a **new** ChatGPT chat, paste one code block, download the result.
 
 **How to add them to the site**
 1. Save each download into `images-inbox/` with the exact filename shown above its prompt (`.png`, or `.webp` if that's what ChatGPT gives you).
-2. Run `npm run images`. It resizes and optimises every image, builds the thermal versions of the two hero photos, and the site picks them up on the next build.
+2. Run `npm run images`. It cuts every image into the sizes the site serves (AVIF and WebP), and the site picks them up on the next build.
 3. Tell me "images added". I'll look at the two hero photos and line up the four defect markers (damp skirting, socket, hollow tile, window sill) with what's actually in the frame.
 
 Until a file exists, its slot shows a designed placeholder, so the site never looks broken.
 
-The eighth image, the window-sill case photo, is real: I crop it from your reference screenshot of the Instagram post.
+The ninth image, the window-sill case photo, is real: I crop it from your reference screenshot of the Instagram post.
 
 ---
 
@@ -183,4 +183,28 @@ Size: aspect ratio 1:1, 2000 x 2000 pixels. If this exact size isn't available, 
 Output format: PNG.
 
 Avoid: any text, logos or watermarks; readable text or numbers on the gauge; dramatic wide cracks or crumbling walls; distorted or extra fingers; plastic skin; glossy AI look; warm yellow cast.
+```
+
+---
+
+## 8. Construction site
+
+`construction-site.png` · 4:5 · 1600 × 2000 px · The building construction service. An illustration of the work, not a VP Constructions project: it stays until real project photos arrive.
+
+```text
+Create a photorealistic photograph of a site engineer checking steel reinforcement on a residential building site in Pune, India.
+
+Subject: an Indian site engineer in a white hard hat, a navy work shirt with a thin teal trim and a high-visibility vest, seen from the side at chest height, holding a steel measuring tape against the vertical reinforcement bars of a concrete column before the formwork closes. Natural skin with real texture, a focused expression, relaxed and correct hands. Behind, softly out of focus: the concrete frame of a mid-rise residential building under construction, with plywood formwork, steel props and a clear morning sky.
+
+Composition, portrait 4:5: the engineer and the reinforcement cage fill the middle and right of the frame, pin-sharp; the left third shows the soft background of the concrete frame. No crowd and no machinery in the foreground.
+
+Art direction: photoreal, natural daylight, the cool whites and greys of fresh concrete and steel, navy and teal only in the clothing, real Indian site details (binding wire, cover blocks, scaffolding). Calm, precise and professional, like a photo from a site inspection report.
+
+Camera and light: full-frame camera, 50 mm lens, f/2.8, ISO 200, soft morning daylight from the left, no flash.
+
+Size: aspect ratio 4:5, 1600 x 2000 pixels. If this exact size isn't available, use the largest available size at this aspect ratio, with no cropping and no letterboxing.
+
+Output format: PNG.
+
+Avoid: any text, logos, company names, signboards or watermarks; readable text on the hard hat, vest or tape; unsafe practices on site; dust, mess or drama; distorted or extra fingers; plastic skin; glossy AI look; warm yellow cast.
 ```

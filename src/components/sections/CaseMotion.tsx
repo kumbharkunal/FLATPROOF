@@ -3,10 +3,12 @@
 import { gsap } from "@/lib/gsap";
 import { useScene } from "@/lib/useScene";
 
-// The photo opens like a shutter, then each fault gets its revision cloud in turn, and the
-// matching note badge lands as its cloud is drawn (the note text itself never dims).
+// The photo opens like a shutter; then, once the whole photo is on screen, each fault gets its
+// revision cloud in turn (a, b, c) and the matching note badge lands as its cloud is drawn. The
+// sequence is timed, not tied to scrolling, so (c) is never drawn after the photo has left the
+// screen (FP-D71). The note text itself never dims.
 export function CaseMotion() {
-  const anchor = useScene(({ ST, section, desktop }) => {
+  const anchor = useScene(({ ST, section }) => {
     const q = gsap.utils.selector(section);
     const photo = section.querySelector<HTMLElement>(".case-photo")!;
     const clouds = q(".case-clouds path");
@@ -24,18 +26,19 @@ export function CaseMotion() {
       ease: "power3.inOut",
       paused: true,
     });
-    const st1 = ST.create({ trigger: photo, start: "top 80%", once: true, onEnter: () => reveal.play() });
+    const st1 = ST.create({ trigger: photo, start: "top 85%", onEnter: () => reveal.play(), onEnterBack: () => reveal.play() });
 
-    const tl = gsap.timeline();
+    // Starts a beat after the shutter, so a jump straight to the case file still shows a, b, c in turn.
+    const tl = gsap.timeline({ paused: true });
     clouds.forEach((c, i) => {
-      const at = i * 0.5;
-      tl.to(c, { strokeDashoffset: 0, duration: 0.45, ease: "power2.inOut" }, at);
-      tl.to(keys[i], { scale: 1, opacity: 1, duration: 0.2, ease: "back.out(2)" }, at + 0.3);
-      tl.to(noteKeys[i], { scale: 1, duration: 0.2, ease: "back.out(2)" }, at + 0.2);
+      const at = 0.3 + i * 0.6;
+      tl.to(c, { strokeDashoffset: 0, duration: 0.5, ease: "power2.inOut" }, at);
+      tl.to(keys[i], { scale: 1, opacity: 1, duration: 0.22, ease: "back.out(2)" }, at + 0.32);
+      tl.to(noteKeys[i], { scale: 1, duration: 0.22, ease: "back.out(2)" }, at + 0.22);
     });
-    const st2 = desktop
-      ? ST.create({ trigger: photo, start: "top 55%", end: "bottom 45%", scrub: true, animation: tl })
-      : ST.create({ trigger: photo, start: "top 60%", animation: tl, toggleActions: "play none none none" });
+    // When the photo's middle reaches 70% of the screen, the whole photo is in view on phones and
+    // desktops alike.
+    const st2 = ST.create({ trigger: photo, start: "center 70%", end: "bottom top", onEnter: () => tl.play(), onEnterBack: () => tl.play() });
 
     return () => {
       st1.kill();
